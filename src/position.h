@@ -3,7 +3,9 @@
 
 #include <cstdint>
 #include <string>
+#include <string.h>
 #include <stdexcept>
+#include <ctype.h>
 
 class Position
 {
@@ -12,8 +14,11 @@ class Position
 
     inline bool set(const char *position)
     {
-        int16_t col = position[0] - 'a';
-        int16_t row = position[1] - '1';
+        if (strlen(position) < 2)
+            return false;
+
+        int16_t col = tolower(position[0]) - 'a';
+        int16_t row = tolower(position[1]) - '1';
         if (row < 0 || row > 7 || col < 0 || col > 7)
             return false;
 
@@ -24,8 +29,11 @@ class Position
 
     inline bool set(std::string position)
     {
-        int16_t col = position[0] - 'a';
-        int16_t row = position[1] - '1';
+        if (position.length() < 2)
+            return false;
+
+        int16_t col = tolower(position[0]) - 'a';
+        int16_t row = tolower(position[1]) - '1';
         if (row < 0 || row > 7 || col < 0 || col > 7)
             return false;
 
@@ -78,12 +86,12 @@ class Position
 
     bool operator==(const char *position) const
     {
-        return (this->row == (position[1] - '1') && this->col == (position[0] - 'a'));
+        return (this->row == (position[1] - '1')) && (this->col == (position[0] - 'a'));
     }
 
     bool operator==(std::string position) const
     {
-        return (this->row == (position[1] - '1') && this->col == (position[0] - 'a'));
+        return (this->row == (position[1] - '1')) && (this->col == (position[0] - 'a'));
     }
 
     Position &operator=(const Position &position)
