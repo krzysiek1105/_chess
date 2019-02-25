@@ -49,7 +49,6 @@ class Piece
     PieceType pieceType;
     Side side;
     bool firstMoveDone;
-    bool castleAvailable;
 
     Piece()
     {
@@ -62,6 +61,5 @@ class Piece
         this->pieceType = pieceType;
         this->side = side;
         firstMoveDone = false;
-        castleAvailable = true;
     }
 };

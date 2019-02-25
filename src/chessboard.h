@@ -9,6 +9,43 @@
 class Chessboard
 {
   public:
+    typedef enum move_type
+    {
+        NORMAL,
+        CASTLING,
+        EN_PASSANT,
+        PAWN_PROMOTION
+    } MoveType;
+
+    typedef struct move_t
+    {
+        MoveType moveType;
+        Position from;
+        Position to;
+        // Used if moveType is CASTLING
+        Side side;
+        bool kingSideCastle;
+        // Used if moveType is EN_PASSANT
+        Position enPassantAttackedPawn;
+        // Used if moveType is PAWN_PROMOTION
+        PieceType pieceType;
+
+        // That's all we need if moveType is NORMAL
+        move_t(Position pos)
+        {
+            moveType = NORMAL;
+            to = pos;
+        }
+
+        // If moveType is CASTLING
+        move_t(Side side, bool kingSideCastle)
+        {
+            moveType = CASTLING;
+            this->side = side;
+            this->kingSideCastle = kingSideCastle;
+        }
+    } Move;
+
     std::array<std::array<Piece, 8>, 8> pieces;
     int movesDone;
 
@@ -52,19 +89,9 @@ class Chessboard
         pieces[7][6] = Piece(PAWN, BLACK);
     }
 
-    std::vector<std::pair<Position, Piece>> findPiece(PieceType pieceType, Side side)
+    std::vector<Move> getLegalMovesAt(Position position)
     {
-        std::vector<std::pair<Position, Piece>> out;
-        for (int x = 0; x < 8; x++)
-            for (int y = 0; y < 8; y++)
-                if (pieces[x][y].pieceType == pieceType && pieces[x][y].side == side)
-                    out.push_back(std::make_pair(Position(x, y), pieces[x][y]));
-        return out;
-    }
-
-    std::vector<Position> getLegalMovesAt(Position position)
-    {
-        std::vector<Position> result;
+        std::vector<Move> result;
 
         Piece &current = pieces[position.x][position.y];
         int direction = (current.side == WHITE ? 1 : -1);
@@ -75,25 +102,25 @@ class Chessboard
             int current_y = position.y + direction;
             if (!(current_x < 0 || current_x > 7 || current_y < 0 || current_y > 7))
                 if (pieces[current_x][current_y].pieceType == EMPTY)
-                    result.push_back(Position(current_x, current_y));
+                    result.push_back(Move(Position(current_x, current_y)));
 
             current_x = position.x;
             current_y = position.y + 2 * direction;
             if (!current.firstMoveDone)
                 if (pieces[current_x][current_y].pieceType == EMPTY)
-                    result.push_back(Position(current_x, current_y));
+                    result.push_back(Move(Position(current_x, current_y)));
 
             current_x = position.x - 1;
             current_y = position.y + direction;
             if (!(current_x < 0 || current_x > 7 || current_y < 0 || current_y > 7))
                 if (pieces[current_x][current_y].pieceType != EMPTY && pieces[current_x][current_y].side != current.side)
-                    result.push_back(Position(current_x, current_y));
+                    result.push_back(Move(Position(current_x, current_y)));
 
             current_x = position.x + 1;
             current_y = position.y + direction;
             if (!(current_x < 0 || current_x > 7 || current_y < 0 || current_y > 7))
                 if (pieces[current_x][current_y].pieceType != EMPTY && pieces[current_x][current_y].side != current.side)
-                    result.push_back(Position(current_x, current_y));
+                    result.push_back(Move(Position(current_x, current_y)));
         }
         else if (current.pieceType == BISHOP || current.pieceType == QUEEN)
         {
@@ -111,10 +138,10 @@ class Chessboard
                             break;
                         if (pieces[current_x][current_y].side != current.side && pieces[current_x][current_y].pieceType != EMPTY)
                         {
-                            result.push_back(Position(current_x, current_y));
+                            result.push_back(Move(Position(current_x, current_y)));
                             break;
                         }
-                        result.push_back(Position(current_x, current_y));
+                        result.push_back(Move(Position(current_x, current_y)));
                     }
                 }
             }
@@ -132,7 +159,7 @@ class Chessboard
                         if (current_x < 0 || current_x > 7 || current_y < 0 || current_y > 7)
                             continue;
                         if (pieces[current_x][current_y].pieceType == EMPTY || (pieces[current_x][current_y].side != current.side && pieces[current_x][current_y].pieceType != EMPTY))
-                            result.push_back(Position(current_x, current_y));
+                            result.push_back(Move(Position(current_x, current_y)));
                     }
                 }
             }
@@ -156,10 +183,10 @@ class Chessboard
                         break;
                     if (pieces[current_x][current_y].side != current.side && pieces[current_x][current_y].pieceType != EMPTY)
                     {
-                        result.push_back(Position(current_x, current_y));
+                        result.push_back(Move(Position(current_x, current_y)));
                         break;
                     }
-                    result.push_back(Position(current_x, current_y));
+                    result.push_back(Move(Position(current_x, current_y)));
                 }
             }
 
@@ -189,10 +216,10 @@ class Chessboard
                 if (found)
                 {
                     // First, assume that it is true and then test if it is indeed truth.
-                    current.castleAvailable = true;
+                   bool castleAvailable = true;
 
                     if (current.firstMoveDone || king.firstMoveDone)
-                        current.castleAvailable = false;
+                        castleAvailable = false;
                     else
                     {
                         // We are sure that the king and the rook are on the same row, because neither the king or the rook has moved.
@@ -200,7 +227,13 @@ class Chessboard
                         int dir_normalized = dir / abs(dir);
                         for (int i = 1; i < abs(dir); i++)
                             if (pieces[position.x + dir_normalized * i][position.y].pieceType != EMPTY)
-                                current.castleAvailable = false;
+                                castleAvailable = false;
+                        
+                        if(castleAvailable)
+                        {
+                            bool isKingSideCastle = dir < 0;
+                            result.push_back(Move(current.side, isKingSideCastle));
+                        }
                     }
                 }
             }
@@ -228,21 +261,21 @@ class Chessboard
                     break;
                 if (pieces[current_x][current_y].side != current.side && pieces[current_x][current_y].pieceType != EMPTY)
                 {
-                    result.push_back(Position(current_x, current_y));
+                    result.push_back(Move(Position(current_x, current_y)));
                     break;
                 }
-                result.push_back(Position(current_x, current_y));
+                result.push_back(Move(Position(current_x, current_y)));
             }
         }
         return result;
     }
 
-    bool makeMove(Position from, Position to)
+    bool makeMove(MoveType moveType, Position from, Position to)
     {
-        std::vector<Position> legalMoves = getLegalMovesAt(from);
+        std::vector<Move> legalMoves = getLegalMovesAt(from);
         bool found = false;
-        for (Position p : legalMoves)
-            if (to == p)
+        for (Move move : legalMoves)
+            if (to == move.to)
             {
                 found = true;
                 break;
@@ -258,6 +291,12 @@ class Chessboard
         return true;
     }
 
+    bool makeMove(MoveType moveType, Side side, bool isKingSideCastle)
+    {
+        // To do
+        return true;
+    }
+
     friend std::ostream &operator<<(std::ostream &s, const Chessboard &c)
     {
         for (int y = 7; y >= 0; y--)
@@ -265,7 +304,7 @@ class Chessboard
             for (int x = 0; x < 8; x++)
             {
                 if (c.pieces[x][y].pieceType == EMPTY)
-                    std::cout << ".";
+                    s << ".";
                 else if (c.pieces[x][y].side == WHITE)
                     s << "PBKRQ^"[c.pieces[x][y].pieceType];
                 else
