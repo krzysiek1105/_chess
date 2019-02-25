@@ -266,11 +266,9 @@ class Chessboard
             {
                 if (c.pieces[x][y].pieceType == EMPTY)
                     std::cout << ".";
+                else if (c.pieces[x][y].side == WHITE)
+                    s << "PBKRQ^"[c.pieces[x][y].pieceType];
                 else
-                {
-                    if (c.pieces[x][y].side == WHITE)
-                        s << "PBKRQ^"[c.pieces[x][y].pieceType];
-                    else
                         s << "pbkrq*"[c.pieces[x][y].pieceType];
                 }
             }
