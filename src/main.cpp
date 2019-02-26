@@ -15,11 +15,19 @@ int main()
         std::string cmd;
         std::cin >> cmd;
 
-        if (cmd[0] == 'c')
+        if (cmd[0] == 'O' || cmd[0] == 'o')	// for O-O or O-O-O, c was already in use 
         {
             Side side = board.movesDone % 2 == 0 ? WHITE : BLACK;
-            bool isKingSideCastle = cmd[1] == 'k';
-            board.makeMove(Chessboard::MoveType::CASTLING, side, isKingSideCastle);
+			bool castle = 1;
+			bool isKingSideCastle;
+			if (cmd == "O-O" || cmd == "o-o")
+				isKingSideCastle = 1;
+			else if (cmd == "O-O-O" || cmd == "o-o-o")
+				isKingSideCastle = 0;
+			else
+				castle = 0;
+			if(castle)
+				board.makeMove(Chessboard::MoveType::CASTLING, side, isKingSideCastle);
         }
         else
         {

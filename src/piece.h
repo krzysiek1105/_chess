@@ -4,20 +4,20 @@
 
 typedef enum piece_type
 {
-    PAWN,
+	EMPTY,
+	PAWN,
     BISHOP,
     KNIGHT,
     ROOK,
     QUEEN,
     KING,
-    EMPTY
 } PieceType;
 
 typedef enum side
 {
-    WHITE,
-    BLACK,
-    NONE
+	BLACK = -1,
+	NONE,
+	WHITE
 } Side;
 
 typedef struct position_t
@@ -49,6 +49,7 @@ class Piece
     PieceType pieceType;
     Side side;
     bool firstMoveDone;
+	bool twoSquares;
 
     Piece()
     {
@@ -61,5 +62,6 @@ class Piece
         this->pieceType = pieceType;
         this->side = side;
         firstMoveDone = false;
+		twoSquares = false;
     }
 };
