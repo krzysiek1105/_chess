@@ -36,14 +36,11 @@ class Chessboard
         }
 
         // If moveType is CASTLING
-        move_t(Side side, bool kingSideCastle, Position kingPosition, Position rookPosition)
+        move_t(Side side, bool kingSideCastle)
         {
             moveType = CASTLING;
             this->side = side;
             this->kingSideCastle = kingSideCastle;
-            // We need to know the positions of the figures in order to change firstMoveDone parameters
-            from = kingPosition;
-            to = rookPosition;
         }
     } Move;
 
@@ -220,46 +217,34 @@ class Chessboard
     std::vector<Move> getCastling()
     {
         std::vector<Move> result;
-        for (int rook_x = 0; rook_x < 8; rook_x++)
+        for (int side = 0; side < 8; side += 7)
         {
-            for (int rook_y = 0; rook_y < 8; rook_y++)
+            // Kingside
+            if (!pieces[4][side].firstMoveDone && !pieces[7][side].firstMoveDone)
             {
-                if (pieces[rook_x][rook_y].pieceType != ROOK)
-                    continue;
-                Piece rook = pieces[rook_x][rook_y];
-
-                for (int king_x = 0; king_x < 8; king_x++)
-                {
-                    for (int king_y = 0; king_y < 8; king_y++)
+                bool castleAvailable = true;
+                for (int i = 1; i < 7 - 4; i++)
+                    if (pieces[4 + i][side].pieceType != EMPTY)
                     {
-                        if (pieces[king_x][king_y].pieceType != KING || pieces[king_x][king_y].side != rook.side)
-                            continue;
-                        Piece king = pieces[king_x][king_y];
-
-                        // First, assume that it is true and then test if it is indeed truth.
-                        bool castleAvailable = true;
-                        if (rook.firstMoveDone || king.firstMoveDone)
-                            castleAvailable = false;
-                        else
-                        {
-                            // We are sure that the king and the rook are on the same row, because neither the king or the rook has moved.
-                            int dir = king_x - rook_x;
-                            int dir_normalized = dir > 0 ? 1 : -1;
-                            for (int i = 1; i < abs(dir); i++)
-                                if (pieces[rook_x + dir_normalized * i][rook_y].pieceType != EMPTY)
-                                {
-                                    castleAvailable = false;
-                                    break;
-                                }
-
-                            if (castleAvailable)
-                            {
-                                bool isKingSideCastle = dir_normalized < 0 ? true : false;
-                                result.push_back(Move(rook.side, isKingSideCastle, Position(king_x, king_y), Position(rook_x, rook_y)));
-                            }
-                        }
+                        castleAvailable = false;
+                        break;
                     }
-                }
+                if (castleAvailable)
+                    result.push_back(Move(side == 0 ? WHITE : BLACK, true));
+            }
+
+            // Queenside
+            if (!pieces[4][side].firstMoveDone && !pieces[0][side].firstMoveDone)
+            {
+                bool castleAvailable = true;
+                for (int i = 1; i < 4 - 0; i++)
+                    if (pieces[4 - i][side].pieceType != EMPTY)
+                    {
+                        castleAvailable = false;
+                        break;
+                    }
+                if (castleAvailable)
+                    result.push_back(Move(side == 0 ? WHITE : BLACK, false));
             }
         }
         return result;
@@ -303,43 +288,22 @@ class Chessboard
         for (Move move : legalMoves)
             if (move.side == side && move.kingSideCastle == isKingSideCastle)
             {
-                Position king_pos = move.from;
-                Position rook_pos = move.to;
+                int y = side == WHITE ? 0 : 7;
+                int new_king_x = isKingSideCastle ? 6 : 2;
+                int rook_x = isKingSideCastle ? 7 : 0;
+                int new_rook_x = isKingSideCastle ? 5 : 3;
 
-                pieces[king_pos.x][king_pos.y].firstMoveDone = true;
-                pieces[rook_pos.x][rook_pos.y].firstMoveDone = true;
+                pieces[4][y].firstMoveDone = true;
+                pieces[rook_x][y].firstMoveDone = true;
 
-                if (isKingSideCastle)
-                {
-                    if (side == WHITE)
-                    {
-                        pieces[6][0] = pieces[king_pos.x][king_pos.y];
-                        pieces[5][0] = pieces[rook_pos.x][rook_pos.y];
-                    }
-                    else
-                    {
-                        pieces[6][7] = pieces[king_pos.x][king_pos.y];
-                        pieces[5][7] = pieces[rook_pos.x][rook_pos.y];
-                    }
-                }
-                else
-                {
-                    if (side == WHITE)
-                    {
-                        pieces[2][0] = pieces[king_pos.x][king_pos.y];
-                        pieces[3][0] = pieces[rook_pos.x][rook_pos.y];
-                    }
-                    else
-                    {
-                        pieces[2][7] = pieces[king_pos.x][king_pos.y];
-                        pieces[3][7] = pieces[rook_pos.x][rook_pos.y];
-                    }
-                }
+                pieces[new_king_x][y] = pieces[4][y];
+                pieces[new_rook_x][y] = pieces[rook_x][y];
 
-                pieces[king_pos.x][king_pos.y].pieceType = EMPTY;
-                pieces[king_pos.x][king_pos.y].side = NONE;
-                pieces[rook_pos.x][rook_pos.y].pieceType = EMPTY;
-                pieces[rook_pos.x][rook_pos.y].side = NONE;
+                pieces[4][y].pieceType = EMPTY;
+                pieces[4][y].side = NONE;
+                pieces[rook_x][y].pieceType = EMPTY;
+                pieces[rook_x][y].side = NONE;
+
                 movesDone++;
                 return true;
             }
