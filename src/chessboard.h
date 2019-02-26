@@ -42,6 +42,12 @@ class Chessboard
             this->side = side;
             this->kingSideCastle = kingSideCastle;
         }
+
+        move_t(MoveType moveType, Position pos)
+        {
+            this->moveType = moveType;
+            to = pos;
+        }
     } Move;
 
     std::array<std::array<Piece, 8>, 8> pieces;
@@ -53,6 +59,7 @@ class Chessboard
     std::vector<Move> getCastling();
     bool makeMove(Position from, Position to);
     bool makeMove(Side side, bool isKingSideCastle);
+    bool makeMove(PieceType promoted, Position from, Position to);
     friend std::ostream &operator<<(std::ostream &s, const Chessboard &c);
 
     bool arePointsCollinear(Position a, Position b);

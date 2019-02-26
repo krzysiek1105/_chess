@@ -4,7 +4,7 @@ bool Chessboard::arePointsCollinear(Position a, Position b)
 {
     if (a.x == b.x || a.y == b.y)
         return true;
-    if (abs(a.x - a.y) == abs(b.x - b.y))
+    if ((a.x - a.y == b.x - b.y) || (a.x + a.y == b.x + b.y))
         return true;
     return false;
 }
