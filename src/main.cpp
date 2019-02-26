@@ -26,13 +26,13 @@ int main()
 			else
 				castle = 0;
 			if(castle)
-				board.makeMove(Chessboard::MoveType::CASTLING, side, isKingSideCastle);
+				board.makeMove(side, isKingSideCastle);
         }
         else
         {
             Position from = Position(cmd[0] - 'a', cmd[1] - '1');
             Position to = Position(cmd[2] - 'a', cmd[3] - '1');
-            board.makeMove(Chessboard::MoveType::NORMAL, from, to);
+            board.makeMove(from, to);
         }
     }
 
