@@ -3,7 +3,6 @@
 #include "chessboard.h"
 #include "piece.h"
 #include <stdlib.h>
-#include <windows.h>
 
 int main()
 {
