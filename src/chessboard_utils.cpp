@@ -9,13 +9,13 @@ bool Chessboard::arePointsCollinear(Position a, Position b)
     return false;
 }
 
-bool Chessboard::isPieceBetweenPoints(Position a, Position b)
+int Chessboard::piecesBetweenPoints(Position a, Position b)
 {
     if (!arePointsCollinear(a, b))
-        return false;
+        return -1;
 
-    Position dir = Position(b.x - a.x, b.y - a.y);
-    int len;
+    Position dir = Position(b.x > a.x ? 1 : (b.x < a.x ? -1 : 0), b.y > a.y ? 1 : (b.y < a.y ? -1 : 0));
+    int len, count = 0;
     if (a.x == b.x)
         len = abs(a.y - b.y);
     else
@@ -23,7 +23,7 @@ bool Chessboard::isPieceBetweenPoints(Position a, Position b)
 
     for (int i = 1; i < len; i++)
         if (pieces[a.x + dir.x * i][a.y + dir.y * i].pieceType != EMPTY)
-            return false;
+            count++;
 
-    return true;
+    return count;
 }

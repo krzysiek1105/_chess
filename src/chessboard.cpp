@@ -4,6 +4,8 @@ Chessboard::Chessboard()
 {
     movesDone = 0;
     lastMove = Position(0, 0);
+	whiteKing = Position(4, 0);
+	blackKing = Position(4, 7);
     pieces[0][0] = Piece(ROOK, WHITE);
     pieces[1][0] = Piece(KNIGHT, WHITE);
     pieces[2][0] = Piece(BISHOP, WHITE);
@@ -233,6 +235,12 @@ bool Chessboard::makeMove(Position from, Position to)
         pieces[to.x][from.y].side = NONE;
         pieces[to.x][from.y].pieceType = EMPTY;
     }
+	if (pieces[from.x][from.y].pieceType == KING) {
+		if (pieces[from.x][from.y].side == WHITE)
+			whiteKing = to;
+		else
+			blackKing = to;
+	}
     pieces[from.x][from.y].firstMoveDone = true;
     pieces[to.x][to.y] = pieces[from.x][from.y];
     pieces[from.x][from.y].side = NONE;
@@ -259,6 +267,10 @@ bool Chessboard::makeMove(Side side, bool isKingSideCastle)
             pieces[new_king_x][y] = pieces[4][y];
             pieces[new_rook_x][y] = pieces[rook_x][y];
 
+			if (side == WHITE)
+				whiteKing = Position(new_king_x, y);
+			else
+				blackKing = Position(new_king_x, y);
             pieces[4][y].pieceType = EMPTY;
             pieces[4][y].side = NONE;
             pieces[rook_x][y].pieceType = EMPTY;
@@ -300,14 +312,16 @@ std::ostream &operator<<(std::ostream &s, const Chessboard &c)
         for (int x = 0; x < 8; x++)
         {
             if (c.pieces[x][y].pieceType == EMPTY)
-                s << ".";
+                s << ". ";
             else if (c.pieces[x][y].side == WHITE)
-                s << ".PBNRQK"[c.pieces[x][y].pieceType];
+                s << ".PBNRQK"[c.pieces[x][y].pieceType]<<" ";
             else
-                s << ".pbnrqk"[c.pieces[x][y].pieceType];
+                s << ".pbnrqk"[c.pieces[x][y].pieceType]<<" ";
         }
-
-        s << std::endl;
+		s << y + 1 << std::endl;
     }
+	for (int i = 0; i < 8; i++)
+		s << (char)('a' + i) << " ";
+	s << std::endl << std::endl;
     return s;
 }

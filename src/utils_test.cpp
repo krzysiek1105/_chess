@@ -16,8 +16,25 @@ int main()
     c.makeMove(Position(0, 1), Position(0, 3));
     std::cout << c;
 
-    assert(c.isPieceBetweenPoints(Position(0, 2), Position(0, 5)) == false);
-    assert(c.isPieceBetweenPoints(Position(0, 2), Position(2, 4)) == true);
+	assert(c.piecesBetweenPoints(Position(1, 2), Position(2, 4)) == -1);
+    assert(c.piecesBetweenPoints(Position(0, 2), Position(0, 5)) == 1);
+    assert(c.piecesBetweenPoints(Position(0, 2), Position(4, 6)) == 0);
+	assert(c.piecesBetweenPoints(Position(0, 1), Position(7, 1)) == 6);
+	assert(c.piecesBetweenPoints(Position(0, 7), Position(7, 0)) == 2);
+
+	c.makeMove(Position(4, 6), Position(4, 5));
+	c.makeMove(Position(1, 1), Position(1, 2));
+	c.makeMove(Position(3, 7), Position(7, 3));
+	std::cout << c;
+
+	assert(c.isGuardian(Position(5, 1)) == true);
+	assert(c.isGuardian(Position(6, 2)) == false);
+
+	c.makeMove(Position(6, 1), Position(6, 2));
+	std::cout << c;
+
+	assert(c.isGuardian(Position(5, 1)) == false);
+	assert(c.isGuardian(Position(6, 2)) == false);
 
     return 0;
 }

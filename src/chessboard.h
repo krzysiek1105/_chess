@@ -53,6 +53,8 @@ class Chessboard
     std::array<std::array<Piece, 8>, 8> pieces;
     int movesDone;
     Position lastMove;
+	Position whiteKing;
+	Position blackKing;
 
     Chessboard();
     std::vector<Move> getLegalMovesAt(Position position);
@@ -63,5 +65,7 @@ class Chessboard
     friend std::ostream &operator<<(std::ostream &s, const Chessboard &c);
 
     bool arePointsCollinear(Position a, Position b);
-    bool isPieceBetweenPoints(Position a, Position b);
+    int piecesBetweenPoints(Position a, Position b);
+
+	bool isGuardian(Position position);
 };
