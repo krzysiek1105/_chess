@@ -220,7 +220,7 @@ bool Chessboard::makeMove(Position from, Position to)
     std::vector<Move> legalMoves = getLegalMovesAt(from);
     bool found = false;
     for (Move move : legalMoves)
-        if (to == move.to)
+        if (to == move.to && move.moveType != PAWN_PROMOTION)
         {
             found = true;
             break;
@@ -284,7 +284,7 @@ bool Chessboard::makeMove(Side side, bool isKingSideCastle)
 
 bool Chessboard::makeMove(PieceType promoted, Position from, Position to)
 {
-    if (pieces[from.x][from.y].pieceType != PAWN || promoted == EMPTY || promoted == PAWN || promoted == KING)
+    if (pieces[from.x][from.y].pieceType != PAWN && (promoted != EMPTY || promoted != PAWN || promoted != KING))
         return false;
     if ((!(movesDone % 2) && pieces[from.x][from.y].side != WHITE) || (movesDone % 2 && pieces[from.x][from.y].side != BLACK))
         return false;
@@ -302,6 +302,7 @@ bool Chessboard::makeMove(PieceType promoted, Position from, Position to)
 
     pieces[to.x][to.y] = Piece(promoted, pieces[from.x][from.y].side);
     pieces[from.x][from.y] = Piece();
+    movesDone++;
     return true;
 }
 
