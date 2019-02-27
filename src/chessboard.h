@@ -29,10 +29,11 @@ class Chessboard
         PieceType pieceType;
 
         // That's all we need if moveType is NORMAL
-        move_t(Position pos)
+        move_t(Position from, Position to)
         {
             moveType = NORMAL;
-            to = pos;
+            this->from = from;
+            this->to = to;
         }
 
         // If moveType is CASTLING
@@ -43,10 +44,11 @@ class Chessboard
             this->kingSideCastle = kingSideCastle;
         }
 
-        move_t(MoveType moveType, Position pos)
+        move_t(MoveType moveType, Position from, Position to)
         {
             this->moveType = moveType;
-            to = pos;
+            this->from = from;
+            this->to = to;
         }
     } Move;
 
@@ -59,6 +61,7 @@ class Chessboard
     Chessboard();
     std::vector<Move> getLegalMovesAt(Position position);
     std::vector<Move> getCastling();
+    std::vector<Move> getLegalMoves();
     bool makeMove(Position from, Position to);
     bool makeMove(Side side, bool isKingSideCastle);
     bool makeMove(PieceType promoted, Position from, Position to);
@@ -68,4 +71,5 @@ class Chessboard
     int piecesBetweenPoints(Position a, Position b);
 
 	bool isGuardian(Position position);
+    std::vector<Position> getChecks();
 };

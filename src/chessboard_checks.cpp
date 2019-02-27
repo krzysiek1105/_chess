@@ -34,3 +34,27 @@ bool Chessboard::isGuardian(Position position)
 
 	return false;
 }
+
+std::vector<Position> Chessboard::getChecks()
+{
+	Side side = movesDone % 2 == 0 ? WHITE : BLACK;
+	Position kingPos = movesDone % 2 == 0 ? whiteKing : blackKing;
+
+	std::vector<Position> result;
+
+	for (int x = 0; x < 8; x++)
+	{
+		for (int y = 0; y < 8; y++)
+		{
+			if (pieces[x][y].side == side * -1)
+			{
+				std::vector<Move> moves = getLegalMovesAt(Position(x, y));
+				for (Move move : moves)
+					if (move.to == kingPos)
+						result.push_back(Position(move.from));
+			}
+		}
+	}
+
+	return result;
+}
