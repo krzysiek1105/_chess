@@ -55,8 +55,8 @@ class Chessboard
     std::array<std::array<Piece, 8>, 8> pieces;
     int movesDone;
     Position lastMove;
-	Position whiteKing;
-	Position blackKing;
+    Position whiteKing;
+    Position blackKing;
 
     Chessboard();
     std::vector<Move> getLegalMovesAt(Position position);
@@ -69,7 +69,9 @@ class Chessboard
 
     bool arePointsCollinear(Position a, Position b);
     int piecesBetweenPoints(Position a, Position b);
+    Position getDirectionFromPoints(Position a, Position b);
+    bool isPointBetweenPoints(Position a, Position b, Position toCheck);
 
-	Position isGuardian(Position position);
+    Position isGuardian(Position position);
     std::vector<Position> getChecks();
 };

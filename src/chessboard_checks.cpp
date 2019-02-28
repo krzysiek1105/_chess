@@ -8,7 +8,7 @@ Position Chessboard::isGuardian(Position position)
 	Position king = piece.side == WHITE ? whiteKing : blackKing;
 	if (piecesBetweenPoints(position, king))
 		return Position(0, 0);
-	Position dir = Position(position.x > king.x ? 1 : (position.x < king.x ? -1 : 0), position.y > king.y ? 1 : (position.y < king.y ? -1 : 0)); // Should be replaced by a function
+	Position dir = getDirectionFromPoints(king, position);
 	
 	for (int i = 1;; i++) {
 		int x = position.x + dir.x * i, y = position.y + dir.y * i;

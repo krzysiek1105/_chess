@@ -9,12 +9,17 @@ bool Chessboard::arePointsCollinear(Position a, Position b)
     return false;
 }
 
+Position Chessboard::getDirectionFromPoints(Position a, Position b)
+{
+    return Position(b.x > a.x ? 1 : (b.x < a.x ? -1 : 0), b.y > a.y ? 1 : (b.y < a.y ? -1 : 0));
+}
+
 int Chessboard::piecesBetweenPoints(Position a, Position b)
 {
     if (!arePointsCollinear(a, b))
         return -1;
 
-    Position dir = Position(b.x > a.x ? 1 : (b.x < a.x ? -1 : 0), b.y > a.y ? 1 : (b.y < a.y ? -1 : 0));
+    Position dir = getDirectionFromPoints(a, b);
     int len, count = 0;
     if (a.x == b.x)
         len = abs(a.y - b.y);
@@ -26,4 +31,20 @@ int Chessboard::piecesBetweenPoints(Position a, Position b)
             count++;
 
     return count;
+}
+
+bool Chessboard::isPointBetweenPoints(Position a, Position b, Position toCheck)
+{
+    if (!arePointsCollinear(a, toCheck) || !arePointsCollinear(a, b))
+        return false;
+    Position dir1 = getDirectionFromPoints(a, b);
+    Position dir2 = getDirectionFromPoints(a, toCheck);
+    if (dir1 == dir2)
+    {
+        int diff1 = abs(a.x - b.x) + abs(a.y - b.y);
+        int diff2 = abs(a.x - toCheck.x) + abs(a.y - toCheck.y);
+        if (diff2 <= diff1)
+            return true;
+    }
+    return false;
 }
