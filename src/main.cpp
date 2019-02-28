@@ -30,10 +30,26 @@ int main()
 {
     sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "Chess", sf::Style::Titlebar | sf::Style::Close);
 
-    sf::Texture boardTexture;
-    boardTexture.loadFromFile("img/board.png");
-    sf::Sprite boardSprite;
-    boardSprite.setTexture(boardTexture);
+    sf::Texture whiteSquareTexture;
+    whiteSquareTexture.loadFromFile("img/whiteSquare.png");
+    sf::Texture blackSquareTexture;
+    blackSquareTexture.loadFromFile("img/blackSquare.png");
+
+    std::vector<sf::Sprite> squares;
+    for (int y = 7; y >= 0; y--)
+    {
+        for (int x = 0; x < 8; x++)
+        {
+            sf::Sprite tmp;
+            if ((x + y) % 2 == 0)
+                tmp.setTexture(whiteSquareTexture);
+            else
+                tmp.setTexture(blackSquareTexture);
+            tmp.setPosition(x * (WINDOW_SIZE / 8), y * (WINDOW_SIZE / 8));
+
+            squares.push_back(tmp);
+        }
+    }
 
     Position from;
     Position to;
@@ -41,7 +57,7 @@ int main()
     Chessboard chessboard;
 
     std::vector<sf::Texture> textures;
-    for(int i = 1; i < 13; i++)
+    for (int i = 1; i < 13; i++)
     {
         sf::Texture tmp;
         std::string name = "img/" + std::to_string(i) + ".png";
@@ -51,14 +67,13 @@ int main()
     }
 
     std::vector<sf::Sprite> pieces;
-    for(int i = 0; i < 32; i++)
+    for (int i = 0; i < 32; i++)
     {
         sf::Sprite tmp;
         pieces.push_back(tmp);
     }
 
     setPieces(chessboard, pieces, textures);
-
 
     while (window.isOpen())
     {
@@ -77,6 +92,16 @@ int main()
 
                 from.x = fieldX;
                 from.y = fieldY;
+
+                std::vector<Chessboard::Move> legalMoves = chessboard.getLegalMoves();
+                for (Chessboard::Move m : legalMoves)
+                {
+                    if (m.from == from)
+                    {
+                        int n = m.to.x + m.to.y * 8;
+                        squares[n].setColor(sf::Color(140, 205, 16, 255));
+                    }
+                }
             }
 
             if (event.type == sf::Event::MouseButtonReleased)
@@ -102,12 +127,21 @@ int main()
                 chessboard.makeMove(from, to);
                 std::cout << chessboard;
                 setPieces(chessboard, pieces, textures);
+
+                for (int i = 0; i < 64; i++)
+                    squares[i].setColor(sf::Color(255, 255, 255, 255));
+
+                if (chessboard.movesDone % 2 == 0)
+                    window.setTitle("White move");
+                else
+                    window.setTitle("Black move");
             }
         }
 
         window.clear();
-        window.draw(boardSprite);
-        for(int i = 0; i < 32; i++)
+        for (int i = 0; i < 64; i++)
+            window.draw(squares[i]);
+        for (int i = 0; i < 32; i++)
             window.draw(pieces[i]);
         window.display();
     }
