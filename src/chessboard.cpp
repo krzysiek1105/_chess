@@ -4,8 +4,8 @@ Chessboard::Chessboard()
 {
     movesDone = 0;
     lastMove = Position(0, 0);
-	whiteKing = Position(4, 0);
-	blackKing = Position(4, 7);
+    whiteKing = Position(4, 0);
+    blackKing = Position(4, 7);
     pieces[0][0] = Piece(ROOK, WHITE);
     pieces[1][0] = Piece(KNIGHT, WHITE);
     pieces[2][0] = Piece(BISHOP, WHITE);
@@ -49,20 +49,23 @@ std::vector<Chessboard::Move> Chessboard::getLegalMovesAt(Position position)
 
     Piece &current = pieces[position.x][position.y];
     int direction = (current.side == WHITE ? 1 : -1);
-
+	Position axis = isGuardian(position);
+	bool guardian = axis.x || axis.y ? true : false;
     if (current.pieceType == PAWN)
     {
         int current_x = position.x;
         int current_y = position.y + direction;
+		
         if (!(current_x < 0 || current_x > 7 || current_y < 0 || current_y > 7))
         {
             if (pieces[current_x][current_y].pieceType == EMPTY)
             {
                 // Pawn promotion
-                if (current_y == (current.side == WHITE ? 7 : 0))
-                    result.push_back(Move(PAWN_PROMOTION, Position(current_x, current_y)));
+                if (current_y == (current.side == WHITE ? 7 : 0) && !guardian)
+                    result.push_back(Move(PAWN_PROMOTION, position, Position(current_x, current_y)));
                 else
-                    result.push_back(Move(Position(current_x, current_y)));
+					if(!guardian || (!axis.x && axis.y))
+						result.push_back(Move(position, Position(current_x, current_y)));
             }
         }
 
@@ -70,7 +73,8 @@ std::vector<Chessboard::Move> Chessboard::getLegalMovesAt(Position position)
         current_y = position.y + 2 * direction;
         if (!current.firstMoveDone)
             if (pieces[current_x][current_y].pieceType == EMPTY && pieces[current_x][current_y - direction].pieceType == EMPTY)
-                result.push_back(Move(Position(current_x, current_y)));
+				if (!guardian || (!axis.x && axis.y))
+					result.push_back(Move(position, Position(current_x, current_y)));
 
         for (int horizontal = -1; horizontal <= 1; horizontal += 2)
         {
@@ -81,13 +85,15 @@ std::vector<Chessboard::Move> Chessboard::getLegalMovesAt(Position position)
                 if (pieces[current_x][current_y].side == current.side * -1)
                 {
                     // Pawn promotion
-                    if (current_y == (current.side == WHITE ? 7 : 0))
-                        result.push_back(Move(PAWN_PROMOTION, Position(current_x, current_y)));
+                    if (current_y == (current.side == WHITE ? 7 : 0) && !guardian)
+                        result.push_back(Move(PAWN_PROMOTION, position, Position(current_x, current_y)));
                     else
-                        result.push_back(Move(Position(current_x, current_y)));
+						if(!guardian || axis.x * axis.y == horizontal * direction)
+							result.push_back(Move(position, Position(current_x, current_y)));
                 }
                 else if (pieces[current_x][current_y].pieceType == EMPTY && pieces[current_x][current_y - direction].pieceType == PAWN && lastMove.x == current_x && lastMove.y == current_y - direction) //en passant
-                    result.push_back(Move(Position(current_x, current_y)));
+					if (!guardian || axis.x * axis.y == horizontal * direction)
+						result.push_back(Move(position, Position(current_x, current_y)));
             }
         }
     }
@@ -95,21 +101,25 @@ std::vector<Chessboard::Move> Chessboard::getLegalMovesAt(Position position)
     {
         for (int horizontal = -1; horizontal <= 1; horizontal += 2)
         {
+			if (guardian && !(axis.x * axis.y))
+				break;
             for (int vertical = -1; vertical <= 1; vertical += 2)
             {
+				if (guardian && axis.x * axis.y != horizontal * vertical)
+					continue;
                 for (int i = 1; i <= 7; i++)
                 {
                     int current_x = position.x + horizontal * i;
                     int current_y = position.y + vertical * i;
                     if (current_x < 0 || current_x > 7 || current_y < 0 || current_y > 7)
                         break;
+					if (!pieces[current_x][current_y].pieceType) {
+						result.push_back(Move(position, Position(current_x, current_y)));
+						continue;
+					}
                     if (pieces[current_x][current_y].side == current.side * -1)
-                    {
-                        result.push_back(Move(Position(current_x, current_y)));
-                        break;
-                    }
-                    if (!pieces[current_x][current_y].pieceType)
-                        result.push_back(Move(Position(current_x, current_y)));
+                        result.push_back(Move(position, Position(current_x, current_y)));
+					break;
                 }
             }
         }
@@ -118,6 +128,8 @@ std::vector<Chessboard::Move> Chessboard::getLegalMovesAt(Position position)
     {
         for (int horizontal = -1; horizontal <= 1; horizontal += 2)
         {
+			if (guardian)
+				break;
             for (int vertical = -1; vertical <= 1; vertical += 2)
             {
                 for (int x = -2; x <= -1; x++)
@@ -127,7 +139,7 @@ std::vector<Chessboard::Move> Chessboard::getLegalMovesAt(Position position)
                     if (current_x < 0 || current_x > 7 || current_y < 0 || current_y > 7)
                         continue;
                     if (pieces[current_x][current_y].pieceType == EMPTY || pieces[current_x][current_y].side == current.side * -1)
-                        result.push_back(Move(Position(current_x, current_y)));
+                        result.push_back(Move(position, Position(current_x, current_y)));
                 }
             }
         }
@@ -141,19 +153,26 @@ std::vector<Chessboard::Move> Chessboard::getLegalMovesAt(Position position)
         dirs.push_back(Position(0, -1));
         for (Position dir : dirs)
         {
+			if (guardian)
+			{
+				if (axis.x * axis.y)
+					break;
+				if (!(axis.x* dir.x) && !(axis.y* dir.y))
+					continue;
+			}
             for (int i = 1; i <= 7; i++)
             {
                 int current_x = position.x + dir.x * i;
                 int current_y = position.y + dir.y * i;
                 if (current_x < 0 || current_x > 7 || current_y < 0 || current_y > 7)
                     break;
-                if (pieces[current_x][current_y].side == current.side * -1)
-                {
-                    result.push_back(Move(Position(current_x, current_y)));
-                    break;
-                }
-                if (!pieces[current_x][current_y].pieceType)
-                    result.push_back(Move(Position(current_x, current_y)));
+				if (!pieces[current_x][current_y].pieceType) {
+					result.push_back(Move(position, Position(current_x, current_y)));
+					continue;
+				}
+                else if (pieces[current_x][current_y].side == current.side * -1)
+					result.push_back(Move(position, Position(current_x, current_y)));
+				break;
             }
         }
     }
@@ -168,7 +187,7 @@ std::vector<Chessboard::Move> Chessboard::getLegalMovesAt(Position position)
                 if (current_x < 0 || current_x > 7 || current_y < 0 || current_y > 7)
                     continue;
                 if (pieces[current_x][current_y].pieceType == EMPTY || pieces[current_x][current_y].side == current.side * -1)
-                    result.push_back(Move(Position(current_x, current_y)));
+                    result.push_back(Move(position, Position(current_x, current_y)));
             }
         }
     }
@@ -212,15 +231,81 @@ std::vector<Chessboard::Move> Chessboard::getCastling()
     return result;
 }
 
+std::vector<Chessboard::Move> Chessboard::getLegalMoves()
+{
+    std::vector<Chessboard::Move> result;
+    std::vector<Position> checks = getChecks();
+
+    Side side = movesDone % 2 == 0 ? WHITE : BLACK;
+    if (checks.size() > 0)
+    {
+        Position kingPos = movesDone % 2 == 0 ? whiteKing : blackKing;
+        // Check if the king can escape
+        std::vector<Chessboard::Move> bannedFields = getLegalMovesAt(checks[0]);
+        std::vector<Chessboard::Move> kingEscapeFields = getLegalMovesAt(kingPos);
+        for (Move &king : kingEscapeFields)
+        {
+            bool found = false;
+            for (Move &banned : bannedFields)
+                if (king.to == banned.to)
+                    found = true;
+
+            if (!found)
+                result.push_back(king);
+        }
+
+        if (checks.size() == 1)
+        {
+            for (int x = 0; x < 8; x++)
+            {
+                for (int y = 0; y < 8; y++)
+                {
+                    if (pieces[x][y].pieceType == EMPTY || pieces[x][y].side != side)
+                        continue;
+
+                    std::vector<Chessboard::Move> normal = getLegalMovesAt(Position(x, y));
+                    for (Move &move : normal)
+                    {
+                        // Piece can beat opponent's piece
+                        if (move.to == checks[0])
+                            result.push_back(move);
+                        // Be a guard for the king
+                        if(move.from == kingPos)
+                            continue;
+                        if (arePointsCollinear(move.to, kingPos) && arePointsCollinear(move.to, checks[0]))
+                            result.push_back(move);
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        std::vector<Chessboard::Move> castling = getCastling();
+        for (int x = 0; x < 8; x++)
+        {
+            for (int y = 0; y < 8; y++)
+            {
+                if (pieces[x][y].side != side)
+                    continue;
+                std::vector<Chessboard::Move> normal = getLegalMovesAt(Position(x, y));
+                result.insert(result.end(), normal.begin(), normal.end());
+            }
+        }
+        result.insert(result.end(), castling.begin(), castling.end());
+    }
+    return result;
+}
+
 bool Chessboard::makeMove(Position from, Position to)
 {
     if ((!(movesDone % 2) && pieces[from.x][from.y].side != WHITE) || (movesDone % 2 && pieces[from.x][from.y].side != BLACK))
         return false;
 
-    std::vector<Move> legalMoves = getLegalMovesAt(from);
+    std::vector<Move> legalMoves = getLegalMoves();
     bool found = false;
     for (Move move : legalMoves)
-        if (to == move.to && move.moveType != PAWN_PROMOTION)
+        if (from == move.from && to == move.to && move.moveType != PAWN_PROMOTION)
         {
             found = true;
             break;
@@ -235,12 +320,13 @@ bool Chessboard::makeMove(Position from, Position to)
         pieces[to.x][from.y].side = NONE;
         pieces[to.x][from.y].pieceType = EMPTY;
     }
-	if (pieces[from.x][from.y].pieceType == KING) {
-		if (pieces[from.x][from.y].side == WHITE)
-			whiteKing = to;
-		else
-			blackKing = to;
-	}
+    if (pieces[from.x][from.y].pieceType == KING)
+    {
+        if (pieces[from.x][from.y].side == WHITE)
+            whiteKing = to;
+        else
+            blackKing = to;
+    }
     pieces[from.x][from.y].firstMoveDone = true;
     pieces[to.x][to.y] = pieces[from.x][from.y];
     pieces[from.x][from.y].side = NONE;
@@ -267,10 +353,10 @@ bool Chessboard::makeMove(Side side, bool isKingSideCastle)
             pieces[new_king_x][y] = pieces[4][y];
             pieces[new_rook_x][y] = pieces[rook_x][y];
 
-			if (side == WHITE)
-				whiteKing = Position(new_king_x, y);
-			else
-				blackKing = Position(new_king_x, y);
+            if (side == WHITE)
+                whiteKing = Position(new_king_x, y);
+            else
+                blackKing = Position(new_king_x, y);
             pieces[4][y].pieceType = EMPTY;
             pieces[4][y].side = NONE;
             pieces[rook_x][y].pieceType = EMPTY;
@@ -284,7 +370,8 @@ bool Chessboard::makeMove(Side side, bool isKingSideCastle)
 
 bool Chessboard::makeMove(PieceType promoted, Position from, Position to)
 {
-    if (pieces[from.x][from.y].pieceType != PAWN && (promoted != EMPTY || promoted != PAWN || promoted != KING))
+    if (!(pieces[from.x][from.y].pieceType == PAWN && promoted != EMPTY && promoted != PAWN && promoted != KING))
+
         return false;
     if ((!(movesDone % 2) && pieces[from.x][from.y].side != WHITE) || (movesDone % 2 && pieces[from.x][from.y].side != BLACK))
         return false;
@@ -292,7 +379,7 @@ bool Chessboard::makeMove(PieceType promoted, Position from, Position to)
     std::vector<Move> legalMoves = getLegalMovesAt(from);
     bool found = false;
     for (Move move : legalMoves)
-        if (move.moveType == PAWN_PROMOTION && to == move.to)
+        if (move.from == from && move.moveType == PAWN_PROMOTION && to == move.to)
         {
             found = true;
             break;
@@ -315,14 +402,15 @@ std::ostream &operator<<(std::ostream &s, const Chessboard &c)
             if (c.pieces[x][y].pieceType == EMPTY)
                 s << ". ";
             else if (c.pieces[x][y].side == WHITE)
-                s << ".PBNRQK"[c.pieces[x][y].pieceType]<<" ";
+                s << ".PBNRQK"[c.pieces[x][y].pieceType] << " ";
             else
-                s << ".pbnrqk"[c.pieces[x][y].pieceType]<<" ";
+                s << ".pbnrqk"[c.pieces[x][y].pieceType] << " ";
         }
-		s << y + 1 << std::endl;
+        s << y + 1 << std::endl;
     }
-	for (int i = 0; i < 8; i++)
-		s << (char)('a' + i) << " ";
-	s << std::endl << std::endl;
+    for (int i = 0; i < 8; i++)
+        s << (char)('a' + i) << " ";
+    s << std::endl
+      << std::endl;
     return s;
 }

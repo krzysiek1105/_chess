@@ -35,7 +35,7 @@ int main()
 
             if (cmd[4] == '=')
             {
-                PieceType promoted;
+                PieceType promoted = EMPTY;
                 switch (cmd[5])
                 {
                 case 'q':
