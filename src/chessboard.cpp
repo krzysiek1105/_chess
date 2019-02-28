@@ -245,10 +245,15 @@ std::vector<Chessboard::Move> Chessboard::getLegalMoves()
         std::vector<Chessboard::Move> kingEscapeFields = getLegalMovesAt(kingPos);
         for (Move &king : kingEscapeFields)
         {
+            if(arePointsCollinear(checks[0], king.to))
+                continue;
             bool found = false;
             for (Move &banned : bannedFields)
                 if (king.to == banned.to)
+                {
                     found = true;
+                    break;
+                }
 
             if (!found)
                 result.push_back(king);
