@@ -3,64 +3,113 @@
 #include "chessboard.h"
 #include "piece.h"
 #include <stdlib.h>
+#include <SFML/Graphics.hpp>
+
+#define WINDOW_SIZE 929
+
+void setPieces(Chessboard &chessboard, std::vector<sf::Sprite> &pieces, std::vector<sf::Texture> &textures)
+{
+    int i = 0;
+    for (int x = 0; x < 8; x++)
+    {
+        for (int y = 0; y < 8; y++)
+        {
+            if (chessboard.pieces[x][y].pieceType == EMPTY)
+                continue;
+
+            Piece piece = chessboard.pieces[x][y];
+            pieces[i].setPosition(x * (WINDOW_SIZE / 8), WINDOW_SIZE - y * (WINDOW_SIZE / 8) - 96);
+            int type = piece.pieceType + (piece.side == BLACK ? 6 : 0) - 1;
+            pieces[i].setTexture(textures[type]);
+            i++;
+        }
+    }
+}
 
 int main()
 {
-    Chessboard board;
-    while (true)
+    sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "Chess", sf::Style::Titlebar | sf::Style::Close);
+
+    sf::Texture boardTexture;
+    boardTexture.loadFromFile("img/board.png");
+    sf::Sprite boardSprite;
+    boardSprite.setTexture(boardTexture);
+
+    Position from;
+    Position to;
+
+    Chessboard chessboard;
+
+    std::vector<sf::Texture> textures;
+    for(int i = 1; i < 13; i++)
     {
-        std::cout << board;
+        sf::Texture tmp;
+        std::string name = "img/" + std::to_string(i) + ".png";
+        tmp.loadFromFile(name);
 
-        std::string cmd;
-        std::cin >> cmd;
+        textures.push_back(tmp);
+    }
 
-        if (cmd[0] == 'O' || cmd[0] == 'o') // for O-O or O-O-O, c was already in use
+    std::vector<sf::Sprite> pieces;
+    for(int i = 0; i < 32; i++)
+    {
+        sf::Sprite tmp;
+        pieces.push_back(tmp);
+    }
+
+    setPieces(chessboard, pieces, textures);
+
+
+    while (window.isOpen())
+    {
+        sf::Event event;
+        while (window.pollEvent(event))
         {
-            Side side = board.movesDone % 2 == 0 ? WHITE : BLACK;
-            bool castle = 1;
-            bool isKingSideCastle;
-            if (cmd == "O-O" || cmd == "o-o")
-                isKingSideCastle = 1;
-            else if (cmd == "O-O-O" || cmd == "o-o-o")
-                isKingSideCastle = 0;
-            else
-                castle = 0;
-            if (castle)
-                board.makeMove(side, isKingSideCastle);
-        }
-        else
-        {
-            Position from = Position(cmd[0] - 'a', cmd[1] - '1');
-            Position to = Position(cmd[2] - 'a', cmd[3] - '1');
+            if (event.type == sf::Event::Closed)
+                window.close();
 
-            if (cmd[4] == '=')
+            if (event.type == sf::Event::MouseButtonPressed)
             {
-                PieceType promoted = EMPTY;
-                switch (cmd[5])
-                {
-                case 'q':
-                case 'Q':
-                    promoted = QUEEN;
-                    break;
-                case 'n':
-                case 'N':
-                    promoted = KNIGHT;
-                    break;
-                case 'b':
-                case 'B':
-                    promoted = BISHOP;
-                    break;
-                case 'r':
-                case 'R':
-                    promoted = ROOK;
-                    break;
-                }
+                int x = event.mouseButton.x;
+                int y = event.mouseButton.y;
+                int fieldX = (x / (float)WINDOW_SIZE) * 8;
+                int fieldY = 8 - (y / (float)WINDOW_SIZE) * 8;
 
-                board.makeMove(promoted, from, to);
+                from.x = fieldX;
+                from.y = fieldY;
             }
-            else
-                board.makeMove(from, to);
+
+            if (event.type == sf::Event::MouseButtonReleased)
+            {
+                int x = event.mouseButton.x;
+                int y = event.mouseButton.y;
+                int fieldX = (x / (float)WINDOW_SIZE) * 8;
+                int fieldY = 8 - (y / (float)WINDOW_SIZE) * 8;
+
+                to.x = fieldX;
+                to.y = fieldY;
+
+                std::string fromString;
+                fromString += "abcdefgh"[from.x];
+                fromString += "12345678"[from.y];
+
+                std::string toString;
+                toString += "abcdefgh"[to.x];
+                toString += "12345678"[to.y];
+
+                std::cout << fromString << " " << toString << std::endl;
+
+                chessboard.makeMove(from, to);
+                std::cout << chessboard;
+                setPieces(chessboard, pieces, textures);
+            }
         }
+
+        window.clear();
+        window.draw(boardSprite);
+        for(int i = 0; i < 32; i++)
+            window.draw(pieces[i]);
+        window.display();
     }
 
     return 0;
