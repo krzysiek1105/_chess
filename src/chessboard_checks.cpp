@@ -1,5 +1,41 @@
 #include "chessboard.h"
 
+bool Chessboard::isSquareSafe(Position position, Side side)
+{
+	std::vector<Chessboard::Move> legalMoves;
+	Position notGuardian = Position(0, 0);
+	legalMoves = getLegalMovesKnight(position, notGuardian, side);
+	for (Move move : legalMoves)
+	{
+		if (pieces[move.to.x][move.to.y].pieceType == KNIGHT && pieces[move.to.x][move.to.y].side == side * -1)
+			return false;
+	}
+	legalMoves = getLegalMovesBishop(position, notGuardian, side);
+	for (Move move : legalMoves)
+	{
+		if ((pieces[move.to.x][move.to.y].pieceType == BISHOP || pieces[move.to.x][move.to.y].pieceType == QUEEN) && pieces[move.to.x][move.to.y].side == side * -1)
+			return false;
+	}
+	legalMoves = getLegalMovesRook(position, notGuardian, side);
+	for (Move move : legalMoves)
+	{
+		if ((pieces[move.to.x][move.to.y].pieceType || pieces[move.to.x][move.to.y].pieceType == QUEEN) && pieces[move.to.x][move.to.y].side == side * -1)
+			return false;
+	}
+	legalMoves = getLegalMovesPawn(position, notGuardian, side);
+	for (Move move : legalMoves)
+	{
+		if (pieces[move.to.x][move.to.y].pieceType == PAWN && pieces[move.to.x][move.to.y].side == side * -1 && move.to.x != position.x)
+			return false;
+	}
+	legalMoves = getLegalMovesKing(position, side);
+	for (Move move : legalMoves)
+	{
+		if (pieces[move.to.x][move.to.y].pieceType == KING && pieces[move.to.x][move.to.y].side == side * -1)
+			return false;
+	}
+	return true;
+}
 Position Chessboard::isGuardian(Position position)
 {
 	Piece piece = pieces[position.x][position.y];
