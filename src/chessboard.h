@@ -81,4 +81,5 @@ public:
 	bool isSquareSafe(Position position, Side side);
 	Position isGuardian(Position position);
 	std::vector<Position> getChecks();
+    bool isCastleSafe(Side side, bool isKingSideCastle);
 };
