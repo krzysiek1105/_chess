@@ -74,4 +74,5 @@ class Chessboard
 
     Position isGuardian(Position position);
     std::vector<Position> getChecks();
+    bool isCastleSafe(Side side, bool isKingSideCastle);
 };

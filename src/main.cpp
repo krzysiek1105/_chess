@@ -94,12 +94,52 @@ int main()
                 from.y = fieldY;
 
                 std::vector<Chessboard::Move> legalMoves = chessboard.getLegalMoves();
+                Side side = chessboard.movesDone % 2 == 0 ? WHITE : BLACK;
                 for (Chessboard::Move m : legalMoves)
                 {
                     if (m.from == from)
                     {
                         int n = m.to.x + m.to.y * 8;
                         squares[n].setColor(sf::Color(140, 205, 16, 255));
+                    }
+                    else if (m.moveType == Chessboard::CASTLING && m.side == side)
+                    {
+                        if (m.side == WHITE)
+                        {
+                            if (m.kingSideCastle)
+                            {
+                                squares[4].setColor(sf::Color(255, 205, 16, 255));
+                                squares[5].setColor(sf::Color(255, 205, 16, 255));
+                                squares[6].setColor(sf::Color(255, 205, 16, 255));
+                                squares[7].setColor(sf::Color(255, 205, 16, 255));
+                            }
+                            else
+                            {
+                                squares[0].setColor(sf::Color(255, 205, 16, 255));
+                                squares[1].setColor(sf::Color(255, 205, 16, 255));
+                                squares[2].setColor(sf::Color(255, 205, 16, 255));
+                                squares[3].setColor(sf::Color(255, 205, 16, 255));
+                                squares[4].setColor(sf::Color(255, 205, 16, 255));
+                            }
+                        }
+                        else
+                        {
+                            if (m.kingSideCastle)
+                            {
+                                squares[63 - 0].setColor(sf::Color(255, 205, 16, 255));
+                                squares[63 - 1].setColor(sf::Color(255, 205, 16, 255));
+                                squares[63 - 2].setColor(sf::Color(255, 205, 16, 255));
+                                squares[63 - 3].setColor(sf::Color(255, 205, 16, 255));
+                            }
+                            else
+                            {
+                                squares[63 - 3].setColor(sf::Color(255, 205, 16, 255));
+                                squares[63 - 4].setColor(sf::Color(255, 205, 16, 255));
+                                squares[63 - 5].setColor(sf::Color(255, 205, 16, 255));
+                                squares[63 - 6].setColor(sf::Color(255, 205, 16, 255));
+                                squares[63 - 7].setColor(sf::Color(255, 205, 16, 255));
+                            }
+                        }
                     }
                 }
             }
@@ -124,17 +164,27 @@ int main()
 
                 std::cout << fromString << " " << toString << std::endl;
 
-                chessboard.makeMove(from, to);
+                if (fromString == "e1" && toString == "h1")
+                    chessboard.makeMove(WHITE, true);
+                else if (fromString == "e1" && toString == "a1")
+                    chessboard.makeMove(WHITE, false);
+                else if (fromString == "e8" && toString == "h8")
+                    chessboard.makeMove(BLACK, true);
+                else if (fromString == "e8" && toString == "a8")
+                    chessboard.makeMove(BLACK, false);
+                else
+                    chessboard.makeMove(from, to);
+
                 std::cout << chessboard;
                 setPieces(chessboard, pieces, textures);
 
                 for (int i = 0; i < 64; i++)
                     squares[i].setColor(sf::Color(255, 255, 255, 255));
 
-                if (chessboard.movesDone % 2 == 0)
-                    window.setTitle("White move");
-                else
-                    window.setTitle("Black move");
+                std::string windowTitle = chessboard.movesDone % 2 == 0 ? "White move " : "Black move ";
+                if (chessboard.getChecks().size() > 0)
+                    windowTitle.append("CHECK");
+                window.setTitle(windowTitle);
             }
         }
 
