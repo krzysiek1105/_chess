@@ -37,9 +37,14 @@ typedef struct position_t
         this->y = y;
     }
 
-    bool operator==(position_t p)
+    bool operator==(position_t p) const
     {
         return this->x == p.x && this->y == p.y;
+    }
+
+    position_t operator+(position_t p) const
+    {
+        return position_t(this->x + p.x, this->y + p.y);
     }
 } Position;
 

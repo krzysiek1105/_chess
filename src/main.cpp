@@ -29,6 +29,7 @@ void setPieces(Chessboard &chessboard, std::vector<sf::Sprite> &pieces, std::vec
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "Chess", sf::Style::Titlebar | sf::Style::Close);
+    window.setFramerateLimit(30);
 
     sf::Texture whiteSquareTexture;
     whiteSquareTexture.loadFromFile("img/whiteSquare.png");

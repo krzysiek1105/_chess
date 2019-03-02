@@ -19,7 +19,7 @@ bool Chessboard::isSquareSafe(Position position, Side side)
 	legalMoves = getLegalMovesRook(position, notGuardian, side);
 	for (Move move : legalMoves)
 	{
-		if ((pieces[move.to.x][move.to.y].pieceType || pieces[move.to.x][move.to.y].pieceType == QUEEN) && pieces[move.to.x][move.to.y].side == side * -1)
+		if ((pieces[move.to.x][move.to.y].pieceType == ROOK || pieces[move.to.x][move.to.y].pieceType == QUEEN) && pieces[move.to.x][move.to.y].side == side * -1)
 			return false;
 	}
 	legalMoves = getLegalMovesPawn(position, notGuardian, side);
@@ -39,23 +39,26 @@ bool Chessboard::isSquareSafe(Position position, Side side)
 Position Chessboard::isGuardian(Position position)
 {
 	Piece piece = pieces[position.x][position.y];
-	if(piece.pieceType == KING || piece.pieceType == EMPTY)
+	if (piece.pieceType == KING || piece.pieceType == EMPTY)
 		return Position(0, 0);
 	Position king = piece.side == WHITE ? whiteKing : blackKing;
 	if (piecesBetweenPoints(position, king))
 		return Position(0, 0);
 	Position dir = getDirectionFromPoints(king, position);
-	
-	for (int i = 1;; i++) {
+
+	for (int i = 1;; i++)
+	{
 		int x = position.x + dir.x * i, y = position.y + dir.y * i;
 		if (x < 0 || x > 7 || y < 0 || y > 7)
 			return Position(0, 0);
 		if (pieces[x][y].pieceType == EMPTY)
 			continue;
-		if (pieces[x][y].side == piece.side * -1) {
+		if (pieces[x][y].side == piece.side * -1)
+		{
 			if (pieces[x][y].pieceType == QUEEN)
 				return dir;
-			if (dir.x == 0 || dir.y == 0) {
+			if (dir.x == 0 || dir.y == 0)
+			{
 				if (pieces[x][y].pieceType == ROOK)
 					return dir;
 			}
