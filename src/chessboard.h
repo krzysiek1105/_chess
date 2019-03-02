@@ -8,7 +8,7 @@
 
 class Chessboard
 {
-public:
+  public:
 	typedef enum move_type
 	{
 		NORMAL,
@@ -71,7 +71,7 @@ public:
 	bool makeMove(Position from, Position to);
 	bool makeMove(Side side, bool isKingSideCastle);
 	bool makeMove(PieceType promoted, Position from, Position to);
-	friend std::ostream& operator<<(std::ostream& s, const Chessboard& c);
+	friend std::ostream &operator<<(std::ostream &s, const Chessboard &c);
 
 	bool arePointsCollinear(Position a, Position b);
 	int piecesBetweenPoints(Position a, Position b);
@@ -81,5 +81,5 @@ public:
 	bool isSquareSafe(Position position, Side side);
 	Position isGuardian(Position position);
 	std::vector<Position> getChecks();
-    bool isCastleSafe(Side side, bool isKingSideCastle);
+	bool isCastleSafe(Side side, bool isKingSideCastle);
 };
