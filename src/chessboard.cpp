@@ -55,7 +55,7 @@ std::vector<Chessboard::Move> Chessboard::getLegalMovesPawn(Position position, P
 		if (pieces[current_x][current_y].pieceType == EMPTY)
 		{
 			// Pawn promotion
-			if (current_y == 7 || current_y == 1 && !guardian)
+			if ((current_y == 7 && side == WHITE) || (current_y == 0 && side == BLACK) && !guardian)
 				result.push_back(Move(PAWN_PROMOTION, position, Position(current_x, current_y)));
 			else if (!guardian || (!axis.x && axis.y))
 				result.push_back(Move(position, Position(current_x, current_y)));
@@ -80,14 +80,14 @@ std::vector<Chessboard::Move> Chessboard::getLegalMovesPawn(Position position, P
 				// Pawn promotion
 				if (!guardian || axis.x * axis.y == horizontal * direction)
 				{
-					if (current_y == side == WHITE ? 7 : 0)
+					if ((current_y == 7 && side == WHITE) || (current_y == 0 && side == BLACK))
 						result.push_back(Move(PAWN_PROMOTION, position, Position(current_x, current_y)));
 					else
 						result.push_back(Move(position, Position(current_x, current_y)));
 				}
 			}
 			//en passant
-			else if (pieces[current_x][current_y].pieceType == EMPTY && pieces[current_x][current_y - direction].pieceType == PAWN && lastMove.x == current_x && lastMove.y == current_y - direction)
+			else if (pieces[current_x][current_y].pieceType == EMPTY && pieces[current_x][current_y - direction].pieceType == PAWN && lastMove.x == current_x && lastMove.y == current_y - direction && pieces[lastMove.x][lastMove.y].twoSquares)
 				if (!guardian || axis.x * axis.y == horizontal * direction)
 					result.push_back(Move(position, Position(current_x, current_y)));
 		}
@@ -391,12 +391,11 @@ bool Chessboard::makeMove(Position from, Position to)
 	if (!found)
 		return false;
 
+	bool twoSquares = false;
 	if (pieces[from.x][from.y].pieceType == PAWN)
 	{
-		if (abs(from.x - to.x) == 2)
-			pieces[to.x][to.y].twoSquares = true;
-		else
-			pieces[to.x][to.y].twoSquares = false;
+		if (abs(from.y - to.y) == 2)
+			twoSquares = true;
 		//en passant
 		if (pieces[to.x][to.y].pieceType == EMPTY && from.x != to.x)
 		{
@@ -413,6 +412,7 @@ bool Chessboard::makeMove(Position from, Position to)
 	}
 	pieces[from.x][from.y].firstMoveDone = true;
 	pieces[to.x][to.y] = pieces[from.x][from.y];
+	pieces[to.x][to.y].twoSquares = twoSquares;
 	pieces[from.x][from.y].side = NONE;
 	pieces[from.x][from.y].pieceType = EMPTY;
 	lastMove = to;
