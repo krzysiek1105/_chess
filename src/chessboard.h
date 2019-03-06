@@ -52,13 +52,22 @@ class Chessboard
 		}
 	} Move;
 
+	typedef enum game_state
+	{
+		IN_GAME,
+		CHECK,
+		MATE,
+		STALEMATE
+	} GameState;
+
+  private:
 	std::array<std::array<Piece, 8>, 8> pieces;
 	int movesDone;
 	Position lastMove;
 	Position whiteKing;
 	Position blackKing;
+	GameState gameState;
 
-	Chessboard();
 	std::vector<Move> getLegalMovesPawn(Position position, Position axis, Side side);
 	std::vector<Move> getLegalMovesKnight(Position position, Position axis, Side side);
 	std::vector<Move> getLegalMovesBishop(Position position, Position axis, Side side);
@@ -67,11 +76,6 @@ class Chessboard
 	std::vector<Move> getLegalMovesKing(Position position, Side side);
 	std::vector<Move> getLegalMovesAt(Position position);
 	std::vector<Move> getCastling();
-	std::vector<Move> getLegalMoves();
-	bool makeMove(Position from, Position to);
-	bool makeMove(Side side, bool isKingSideCastle);
-	bool makeMove(PieceType promoted, Position from, Position to);
-	friend std::ostream &operator<<(std::ostream &s, const Chessboard &c);
 
 	bool arePointsCollinear(Position a, Position b);
 	int piecesBetweenPoints(Position a, Position b);
@@ -82,4 +86,16 @@ class Chessboard
 	Position isGuardian(Position position);
 	std::vector<Position> getChecks();
 	bool isCastleSafe(Side side, bool isKingSideCastle);
+
+  public:
+	Chessboard();
+	std::vector<Move> legalMoves;
+	void getLegalMoves();
+	bool makeMove(Position from, Position to);
+	bool makeMove(Side side, bool isKingSideCastle);
+	bool makeMove(PieceType promoted, Position from, Position to);
+	friend std::ostream &operator<<(std::ostream &s, const Chessboard &c);
+	GameState getGameState();
+	Side getCurrentSide();
+	Piece getPieceAt(Position position);
 };

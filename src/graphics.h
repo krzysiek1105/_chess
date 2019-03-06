@@ -75,10 +75,10 @@ int updatePieces(Chessboard &chessboard, std::vector<sf::Sprite> &pieces, std::v
 	{
 		for (int y = 0; y < 8; y++)
 		{
-			if (chessboard.pieces[x][y].pieceType == EMPTY)
+			if (chessboard.getPieceAt(Position(x, y)).pieceType == EMPTY)
 				continue;
 
-			Piece piece = chessboard.pieces[x][y];
+			Piece piece = chessboard.getPieceAt(Position(x, y));
 			pieces[count].setPosition(x * (WINDOW_SIZE / 8), WINDOW_SIZE - y * (WINDOW_SIZE / 8) - 96);
 			int type = piece.pieceType + (piece.side == BLACK ? 6 : 0) - 1;
 			pieces[count].setTexture(piecesTextures[type]);

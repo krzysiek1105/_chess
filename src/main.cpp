@@ -34,8 +34,8 @@ int main()
 				from.x = fieldX;
 				from.y = fieldY;
 
-				std::vector<Chessboard::Move> legalMoves = chessboard.getLegalMoves();
-				Side side = chessboard.movesDone % 2 == 0 ? WHITE : BLACK;
+				std::vector<Chessboard::Move> legalMoves = chessboard.legalMoves;
+				Side side = chessboard.getCurrentSide();
 				for (Chessboard::Move m : legalMoves)
 				{
 					if (m.from == from)
@@ -43,7 +43,7 @@ int main()
 						int n = m.to.x + m.to.y * 8;
 						squares[n].setColor(sf::Color(140, 205, 16, 255));
 					}
-					else if (m.moveType == Chessboard::CASTLING && m.side == side && chessboard.pieces[from.x][from.y].pieceType == KING)
+					else if (m.moveType == Chessboard::CASTLING && m.side == side && chessboard.getPieceAt(from).pieceType == KING)
 					{
 						if (m.side == WHITE)
 						{
@@ -122,9 +122,19 @@ int main()
 				for (int i = 0; i < 64; i++)
 					squares[i].setColor(sf::Color(255, 255, 255, 255));
 
-				std::string windowTitle = chessboard.movesDone % 2 == 0 ? "White move " : "Black move ";
-				if (chessboard.getChecks().size() > 0)
-					windowTitle.append("CHECK");
+				std::string windowTitle = chessboard.getCurrentSide() == WHITE ? "White move " : "Black move ";
+				switch (chessboard.getGameState())
+				{
+				case Chessboard::CHECK:
+					windowTitle.append("(CHECK)");
+					break;
+				case Chessboard::MATE:
+					windowTitle.append("(MATE)");
+					break;
+				case Chessboard::STALEMATE:
+					windowTitle.append("(STALEMATE)");
+					break;
+				}
 				window.setTitle(windowTitle);
 			}
 		}
