@@ -1,30 +1,20 @@
 #include "chessboard.h"
 #include "piece.h"
-#include "graphics.h"
+#include "chessboard_gui.h"
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "Chess", sf::Style::Titlebar | sf::Style::Close);
-	window.setFramerateLimit(30);
-
-	std::vector<sf::Texture> piecesTextures = loadPiecesTextures();
-	std::vector<sf::Texture> boardTextures = loadBoardTextures();
-
-	std::vector<sf::Sprite> squares = setCheckerboard(boardTextures);
-	std::vector<sf::Sprite> pieces = setPieces();
-
-	Chessboard chessboard;
-	int piecesOnBoard = updatePieces(chessboard, pieces, piecesTextures);
+	ChessboardGUI chessboardGUI;
 
 	Position from;
 	Position to;
-	while (window.isOpen())
+	while (chessboardGUI.window->isOpen())
 	{
 		sf::Event event;
-		while (window.pollEvent(event))
+		while (chessboardGUI.window->pollEvent(event))
 		{
 			if (event.type == sf::Event::Closed)
-				window.close();
+				chessboardGUI.window->close();
 
 			if (event.type == sf::Event::MouseButtonPressed)
 			{
@@ -34,63 +24,13 @@ int main()
 				from.x = fieldX;
 				from.y = fieldY;
 
-				std::vector<Chessboard::Move> legalMoves = chessboard.legalMoves;
-				Side side = chessboard.getCurrentSide();
-				for (Chessboard::Move m : legalMoves)
-				{
-					if (m.from == from)
-					{
-						int n = m.to.x + m.to.y * 8;
-						squares[n].setColor(sf::Color(140, 205, 16, 255));
-					}
-					else if (m.moveType == Chessboard::CASTLING && m.side == side && chessboard.getPieceAt(from).pieceType == KING)
-					{
-						if (m.side == WHITE)
-						{
-							if (m.kingSideCastle)
-							{
-								squares[4].setColor(sf::Color(255, 205, 16, 255));
-								squares[5].setColor(sf::Color(255, 205, 16, 255));
-								squares[6].setColor(sf::Color(255, 205, 16, 255));
-								squares[7].setColor(sf::Color(255, 205, 16, 255));
-							}
-							else
-							{
-								squares[0].setColor(sf::Color(255, 205, 16, 255));
-								squares[1].setColor(sf::Color(255, 205, 16, 255));
-								squares[2].setColor(sf::Color(255, 205, 16, 255));
-								squares[3].setColor(sf::Color(255, 205, 16, 255));
-								squares[4].setColor(sf::Color(255, 205, 16, 255));
-							}
-						}
-						else
-						{
-							if (m.kingSideCastle)
-							{
-								squares[63 - 0].setColor(sf::Color(255, 205, 16, 255));
-								squares[63 - 1].setColor(sf::Color(255, 205, 16, 255));
-								squares[63 - 2].setColor(sf::Color(255, 205, 16, 255));
-								squares[63 - 3].setColor(sf::Color(255, 205, 16, 255));
-							}
-							else
-							{
-								squares[63 - 3].setColor(sf::Color(255, 205, 16, 255));
-								squares[63 - 4].setColor(sf::Color(255, 205, 16, 255));
-								squares[63 - 5].setColor(sf::Color(255, 205, 16, 255));
-								squares[63 - 6].setColor(sf::Color(255, 205, 16, 255));
-								squares[63 - 7].setColor(sf::Color(255, 205, 16, 255));
-							}
-						}
-					}
-				}
+				chessboardGUI.highlight(from);
 			}
 
 			if (event.type == sf::Event::MouseButtonReleased)
 			{
-				int x = event.mouseButton.x;
-				int y = event.mouseButton.y;
-				int fieldX = (x / (float)WINDOW_SIZE) * 8;
-				int fieldY = 8 - (y / (float)WINDOW_SIZE) * 8;
+				int fieldX = (event.mouseButton.x / (float)WINDOW_SIZE) * 8;
+				int fieldY = 8 - (event.mouseButton.y / (float)WINDOW_SIZE) * 8;
 
 				to.x = fieldX;
 				to.y = fieldY;
@@ -106,24 +46,24 @@ int main()
 				std::cout << fromString << " " << toString << std::endl;
 
 				if (fromString == "e1" && toString == "h1")
-					chessboard.makeMove(WHITE, true);
+					chessboardGUI.logicBoard.makeMove(WHITE, true);
 				else if (fromString == "e1" && toString == "a1")
-					chessboard.makeMove(WHITE, false);
+					chessboardGUI.logicBoard.makeMove(WHITE, false);
 				else if (fromString == "e8" && toString == "h8")
-					chessboard.makeMove(BLACK, true);
+					chessboardGUI.logicBoard.makeMove(BLACK, true);
 				else if (fromString == "e8" && toString == "a8")
-					chessboard.makeMove(BLACK, false);
+					chessboardGUI.logicBoard.makeMove(BLACK, false);
 				else
-					chessboard.makeMove(from, to);
+					chessboardGUI.logicBoard.makeMove(from, to);
 
-				std::cout << chessboard;
-				piecesOnBoard = updatePieces(chessboard, pieces, piecesTextures);
+				std::cout << chessboardGUI.logicBoard;
+				chessboardGUI.updatePieces();
 
 				for (int i = 0; i < 64; i++)
-					squares[i].setColor(sf::Color(255, 255, 255, 255));
+					chessboardGUI.squares[i].setColor(sf::Color(255, 255, 255, 255));
 
-				std::string windowTitle = chessboard.getCurrentSide() == WHITE ? "White move " : "Black move ";
-				switch (chessboard.getGameState())
+				std::string windowTitle = chessboardGUI.logicBoard.getCurrentSide() == WHITE ? "White move " : "Black move ";
+				switch (chessboardGUI.logicBoard.getGameState())
 				{
 				case Chessboard::CHECK:
 					windowTitle.append("(CHECK)");
@@ -135,16 +75,16 @@ int main()
 					windowTitle.append("(STALEMATE)");
 					break;
 				}
-				window.setTitle(windowTitle);
+				chessboardGUI.window->setTitle(windowTitle);
 			}
 		}
 
-		window.clear();
+		chessboardGUI.window->clear();
 		for (int i = 0; i < 64; i++)
-			window.draw(squares[i]);
-		for (int i = 0; i < piecesOnBoard; i++)
-			window.draw(pieces[i]);
-		window.display();
+			chessboardGUI.window->draw(chessboardGUI.squares[i]);
+		for (int i = 0; i < chessboardGUI.piecesOnBoard; i++)
+			chessboardGUI.window->draw(chessboardGUI.pieces[i]);
+		chessboardGUI.window->display();
 	}
 
 	return 0;

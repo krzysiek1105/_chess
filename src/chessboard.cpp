@@ -295,10 +295,11 @@ bool Chessboard::makeMove(Side side, bool isKingSideCastle)
 			pieces[rook_x][y].side = NONE;
 			lastMove = Position(new_king_x, y);
 			movesDone++;
+
+			getLegalMoves();
 			return true;
 		}
 
-	getLegalMoves();
 	return false;
 }
 
