@@ -24,6 +24,7 @@ class ChessboardGUI
     void setPieces();
     void updatePieces();
     void highlight(Position from);
+    void resetHighlighting();
 
     ChessboardGUI()
     {

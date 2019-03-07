@@ -54,13 +54,16 @@ int main()
 				else if (fromString == "e8" && toString == "a8")
 					chessboardGUI.logicBoard.makeMove(BLACK, false);
 				else
-					chessboardGUI.logicBoard.makeMove(from, to);
+				{
+					if (chessboardGUI.logicBoard.getPieceAt(from).pieceType == PAWN && (to.y == 0 || to.y == 7))
+						chessboardGUI.logicBoard.makeMove(QUEEN, from, to);
+					else
+						chessboardGUI.logicBoard.makeMove(from, to);
+				}
 
 				std::cout << chessboardGUI.logicBoard;
 				chessboardGUI.updatePieces();
-
-				for (int i = 0; i < 64; i++)
-					chessboardGUI.squares[i].setColor(sf::Color(255, 255, 255, 255));
+				chessboardGUI.resetHighlighting();
 
 				std::string windowTitle = chessboardGUI.logicBoard.getCurrentSide() == WHITE ? "White move " : "Black move ";
 				switch (chessboardGUI.logicBoard.getGameState())

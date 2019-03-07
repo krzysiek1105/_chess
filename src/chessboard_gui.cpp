@@ -121,3 +121,9 @@ void ChessboardGUI::highlight(Position from)
         }
     }
 }
+
+void ChessboardGUI::resetHighlighting()
+{
+    for (int i = 0; i < 64; i++)
+        squares[i].setColor(sf::Color(255, 255, 255, 255));
+}
