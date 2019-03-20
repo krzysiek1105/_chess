@@ -75,48 +75,33 @@ void ChessboardGUI::highlight(Position from)
     sf::Color color(127, 127, 127, 255);
     for (Chessboard::Move m : logicBoard.legalMoves)
     {
+        Piece pieceToMove = logicBoard.getPieceAt(from);
+        Side currentSide = logicBoard.getCurrentSide();
+
         if (m.from == from)
         {
             int n = m.to.x + m.to.y * 8;
             squares[n].setColor(color);
         }
-        else if (m.moveType == Chessboard::CASTLING && m.side == logicBoard.getCurrentSide() && logicBoard.getPieceAt(from).pieceType == KING)
+        else if (m.moveType == Chessboard::CASTLING && m.side == currentSide && pieceToMove.pieceType == KING && pieceToMove.side == currentSide)
         {
             if (m.side == WHITE)
             {
                 if (m.kingSideCastle)
-                {
-                    squares[4].setColor(color);
-                    squares[5].setColor(color);
-                    squares[6].setColor(color);
-                    squares[7].setColor(color);
-                }
+                    for (int i = 4; i <= 7; i++)
+                        squares[i].setColor(color);
                 else
-                {
-                    squares[0].setColor(color);
-                    squares[1].setColor(color);
-                    squares[2].setColor(color);
-                    squares[3].setColor(color);
-                    squares[4].setColor(color);
-                }
+                    for (int i = 0; i <= 4; i++)
+                        squares[i].setColor(color);
             }
             else
             {
                 if (m.kingSideCastle)
-                {
-                    squares[63 - 0].setColor(color);
-                    squares[63 - 1].setColor(color);
-                    squares[63 - 2].setColor(color);
-                    squares[63 - 3].setColor(color);
-                }
+                    for (int i = 63 - 0; i >= 63 - 3; i--)
+                        squares[i].setColor(color);
                 else
-                {
-                    squares[63 - 3].setColor(color);
-                    squares[63 - 4].setColor(color);
-                    squares[63 - 5].setColor(color);
-                    squares[63 - 6].setColor(color);
-                    squares[63 - 7].setColor(color);
-                }
+                    for (int i = 63 - 3; i >= 63 - 7; i--)
+                        squares[i].setColor(color);
             }
         }
     }

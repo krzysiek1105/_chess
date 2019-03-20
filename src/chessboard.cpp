@@ -42,6 +42,10 @@ Chessboard::Chessboard()
 	pieces[6][6] = Piece(PAWN, BLACK);
 	pieces[7][6] = Piece(PAWN, BLACK);
 
+	for(int x = 0; x < 8; x++)
+		for(int y = 2; y < 6; y++)
+			pieces[x][y] = Piece();
+
 	getLegalMoves();
 }
 
