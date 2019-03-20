@@ -3,7 +3,7 @@
 #include "chessboard.h"
 #include <SFML/Graphics.hpp>
 
-#define WINDOW_SIZE 929
+#define WINDOW_SIZE 928
 
 class ChessboardGUI
 {
@@ -25,7 +25,7 @@ class ChessboardGUI
     void updatePieces();
     void highlight(Position from);
     void resetHighlighting();
-
+	PieceType showPromotion(Side side);
     ChessboardGUI()
     {
         window = new sf::RenderWindow(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "Chess", sf::Style::Titlebar | sf::Style::Close);

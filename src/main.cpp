@@ -1,8 +1,9 @@
 #include "chessboard.h"
 #include "piece.h"
 #include "chessboard_gui.h"
+#include <windows.h>
 
-int main()
+int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nFunsterStil)
 {
 	ChessboardGUI chessboardGUI;
 
@@ -18,16 +19,22 @@ int main()
 
 			if (event.type == sf::Event::MouseButtonPressed)
 			{
-				from.x = (event.mouseButton.x / (float)WINDOW_SIZE) * 8;
-				from.y = 8 - (event.mouseButton.y / (float)WINDOW_SIZE) * 8;
+				int fieldX = (event.mouseButton.x / (float)WINDOW_SIZE) * 8;
+				int fieldY = 8 - (event.mouseButton.y / (float)WINDOW_SIZE) * 8;
+
+				from.x = fieldX;
+				from.y = fieldY;
 
 				chessboardGUI.highlight(from);
 			}
 
 			if (event.type == sf::Event::MouseButtonReleased)
 			{
-				to.x = (event.mouseButton.x / (float)WINDOW_SIZE) * 8;
-				to.y = 8 - (event.mouseButton.y / (float)WINDOW_SIZE) * 8;
+				int fieldX = (event.mouseButton.x / (float)WINDOW_SIZE) * 8;
+				int fieldY = 8 - (event.mouseButton.y / (float)WINDOW_SIZE) * 8;
+
+				to.x = fieldX;
+				to.y = fieldY;
 
 				std::string fromString;
 				fromString += "abcdefgh"[from.x];
@@ -49,8 +56,10 @@ int main()
 					chessboardGUI.logicBoard.makeMove(BLACK, false);
 				else
 				{
-					if (chessboardGUI.logicBoard.getPieceAt(from).pieceType == PAWN && (to.y == 0 || to.y == 7))
-						chessboardGUI.logicBoard.makeMove(QUEEN, from, to);
+					if (chessboardGUI.logicBoard.getPieceAt(from).pieceType == PAWN && (to.y == 0 || to.y == 7)) {
+						PieceType pieceType = chessboardGUI.showPromotion(chessboardGUI.logicBoard.getPieceAt(from).side);
+						chessboardGUI.logicBoard.makeMove(pieceType, from, to);
+					}
 					else
 						chessboardGUI.logicBoard.makeMove(from, to);
 				}
