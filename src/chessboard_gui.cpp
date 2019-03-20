@@ -18,11 +18,11 @@ void ChessboardGUI::loadBoardTextures()
     whiteSquareTexture.loadFromFile("img/whiteSquare.png");
     sf::Texture blackSquareTexture;
     blackSquareTexture.loadFromFile("img/blackSquare.png");
-	sf::Texture promotionTexture;
-	promotionTexture.loadFromFile("img/promotionSquares.png");
+    sf::Texture promotionTexture;
+    promotionTexture.loadFromFile("img/promotionSquares.png");
     boardTextures.push_back(whiteSquareTexture);
     boardTextures.push_back(blackSquareTexture);
-	boardTextures.push_back(promotionTexture);
+    boardTextures.push_back(promotionTexture);
 }
 
 void ChessboardGUI::setCheckerboard()
@@ -77,48 +77,33 @@ void ChessboardGUI::highlight(Position from)
     sf::Color color(127, 127, 127, 255);
     for (Chessboard::Move m : logicBoard.legalMoves)
     {
+        Piece pieceToMove = logicBoard.getPieceAt(from);
+        Side currentSide = logicBoard.getCurrentSide();
+
         if (m.from == from)
         {
             int n = m.to.x + m.to.y * 8;
             squares[n].setColor(color);
         }
-        else if (m.moveType == Chessboard::CASTLING && m.side == logicBoard.getCurrentSide() && logicBoard.getPieceAt(from).pieceType == KING)
+        else if (m.moveType == Chessboard::CASTLING && m.side == currentSide && pieceToMove.pieceType == KING && pieceToMove.side == currentSide)
         {
             if (m.side == WHITE)
             {
                 if (m.kingSideCastle)
-                {
-                    squares[4].setColor(color);
-                    squares[5].setColor(color);
-                    squares[6].setColor(color);
-                    squares[7].setColor(color);
-                }
+                    for (int i = 4; i <= 7; i++)
+                        squares[i].setColor(color);
                 else
-                {
-                    squares[0].setColor(color);
-                    squares[1].setColor(color);
-                    squares[2].setColor(color);
-                    squares[3].setColor(color);
-                    squares[4].setColor(color);
-                }
+                    for (int i = 0; i <= 4; i++)
+                        squares[i].setColor(color);
             }
             else
             {
                 if (m.kingSideCastle)
-                {
-                    squares[63 - 0].setColor(color);
-                    squares[63 - 1].setColor(color);
-                    squares[63 - 2].setColor(color);
-                    squares[63 - 3].setColor(color);
-                }
+                    for (int i = 63 - 0; i >= 63 - 3; i--)
+                        squares[i].setColor(color);
                 else
-                {
-                    squares[63 - 3].setColor(color);
-                    squares[63 - 4].setColor(color);
-                    squares[63 - 5].setColor(color);
-                    squares[63 - 6].setColor(color);
-                    squares[63 - 7].setColor(color);
-                }
+                    for (int i = 63 - 3; i >= 63 - 7; i--)
+                        squares[i].setColor(color);
             }
         }
     }
@@ -132,43 +117,43 @@ void ChessboardGUI::resetHighlighting()
 
 PieceType ChessboardGUI::showPromotion(Side side)
 {
-	sf::Sprite piece, background;
-	background.setTexture(boardTextures[2]);
-	background.setPosition(2 * (WINDOW_SIZE / 8), WINDOW_SIZE * 3 / 8);
-	window->draw(background);
-	for (int i = 0; i < 4; i++) {
-		piece.setPosition((i + 2) * (WINDOW_SIZE / 8), WINDOW_SIZE / 2 - 96);
-		piece.setTexture(piecesTextures[i + 1 + (side == WHITE ? 0 : 6)]);
-		window->draw(piece);
-	}
-	window->display();
+    sf::Sprite piece, background;
+    background.setTexture(boardTextures[2]);
+    background.setPosition(2 * (WINDOW_SIZE / 8), WINDOW_SIZE * 3 / 8);
+    window->draw(background);
+    for (int i = 0; i < 4; i++)
+    {
+        piece.setPosition((i + 2) * (WINDOW_SIZE / 8), WINDOW_SIZE / 2 - 96);
+        piece.setTexture(piecesTextures[i + 1 + (side == WHITE ? 0 : 6)]);
+        window->draw(piece);
+    }
+    window->display();
 
-	sf::Event event;
-	Position click, release;
-	while (1)
-	{
-		window->pollEvent(event);
-		if (event.type == sf::Event::Closed)
-			window->close();
-		if (event.type == sf::Event::MouseButtonPressed)
-		{
-			int fieldX = (event.mouseButton.x / (float)WINDOW_SIZE) * 8;
-			int fieldY = 8 - (event.mouseButton.y / (float)WINDOW_SIZE) * 8;
-			click = Position(fieldX, fieldY);
-			if (click.y != 4 || click.x < 2 || click.x > 5)
-				continue;
-			switch (click.x)
-			{
-			case 2:
-				return BISHOP;
-			case 3:
-				return KNIGHT;
-			case 4:
-				return ROOK;
-			case 5:
-				return QUEEN;
-			}
-		}
-	}
+    sf::Event event;
+    Position click, release;
+    while (1)
+    {
+        window->pollEvent(event);
+        if (event.type == sf::Event::Closed)
+            window->close();
+        if (event.type == sf::Event::MouseButtonPressed)
+        {
+            int fieldX = (event.mouseButton.x / (float)WINDOW_SIZE) * 8;
+            int fieldY = 8 - (event.mouseButton.y / (float)WINDOW_SIZE) * 8;
+            click = Position(fieldX, fieldY);
+            if (click.y != 4 || click.x < 2 || click.x > 5)
+                continue;
+            switch (click.x)
+            {
+            case 2:
+                return BISHOP;
+            case 3:
+                return KNIGHT;
+            case 4:
+                return ROOK;
+            case 5:
+                return QUEEN;
+            }
+        }
+    }
 }
- 

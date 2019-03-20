@@ -19,22 +19,16 @@ int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszA
 
 			if (event.type == sf::Event::MouseButtonPressed)
 			{
-				int fieldX = (event.mouseButton.x / (float)WINDOW_SIZE) * 8;
-				int fieldY = 8 - (event.mouseButton.y / (float)WINDOW_SIZE) * 8;
-
-				from.x = fieldX;
-				from.y = fieldY;
+				from.x = (event.mouseButton.x / (float)WINDOW_SIZE) * 8;
+				from.y = 8 - (event.mouseButton.y / (float)WINDOW_SIZE) * 8;
 
 				chessboardGUI.highlight(from);
 			}
 
 			if (event.type == sf::Event::MouseButtonReleased)
 			{
-				int fieldX = (event.mouseButton.x / (float)WINDOW_SIZE) * 8;
-				int fieldY = 8 - (event.mouseButton.y / (float)WINDOW_SIZE) * 8;
-
-				to.x = fieldX;
-				to.y = fieldY;
+				to.x = (event.mouseButton.x / (float)WINDOW_SIZE) * 8;
+				to.y = 8 - (event.mouseButton.y / (float)WINDOW_SIZE) * 8;
 
 				std::string fromString;
 				fromString += "abcdefgh"[from.x];
