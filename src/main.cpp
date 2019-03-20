@@ -1,9 +1,8 @@
 #include "chessboard.h"
 #include "piece.h"
 #include "chessboard_gui.h"
-#include <windows.h>
 
-int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nFunsterStil)
+int main()
 {
 	ChessboardGUI chessboardGUI;
 
@@ -50,9 +49,23 @@ int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszA
 					chessboardGUI.logicBoard.makeMove(BLACK, false);
 				else
 				{
-					if (chessboardGUI.logicBoard.getPieceAt(from).pieceType == PAWN && (to.y == 0 || to.y == 7)) {
-						PieceType pieceType = chessboardGUI.showPromotion(chessboardGUI.logicBoard.getPieceAt(from).side);
-						chessboardGUI.logicBoard.makeMove(pieceType, from, to);
+					Piece currentPiece = chessboardGUI.logicBoard.getPieceAt(from);
+					if (currentPiece.pieceType == PAWN && currentPiece.side == chessboardGUI.logicBoard.getCurrentSide() && (to.y == 0 || to.y == 7))
+					{
+						bool canBePromoted = false;
+						std::vector<Chessboard::Move> moves = chessboardGUI.logicBoard.getLegalMovesAt(from);
+						for (Chessboard::Move move : moves)
+							if (move.moveType == Chessboard::PAWN_PROMOTION && move.from == from && move.to == to)
+							{
+								canBePromoted = true;
+								break;
+							}
+
+						if (canBePromoted)
+						{
+							PieceType pieceType = chessboardGUI.showPromotion();
+							chessboardGUI.logicBoard.makeMove(pieceType, from, to);
+						}
 					}
 					else
 						chessboardGUI.logicBoard.makeMove(from, to);

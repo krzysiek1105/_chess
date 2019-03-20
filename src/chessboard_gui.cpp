@@ -115,7 +115,7 @@ void ChessboardGUI::resetHighlighting()
         squares[i].setColor(sf::Color(255, 255, 255, 255));
 }
 
-PieceType ChessboardGUI::showPromotion(Side side)
+PieceType ChessboardGUI::showPromotion()
 {
     sf::Sprite piece, background;
     background.setTexture(boardTextures[2]);
@@ -124,14 +124,14 @@ PieceType ChessboardGUI::showPromotion(Side side)
     for (int i = 0; i < 4; i++)
     {
         piece.setPosition((i + 2) * (WINDOW_SIZE / 8), WINDOW_SIZE / 2 - PIECE_SIZE);
-        piece.setTexture(piecesTextures[i + 1 + (side == WHITE ? 0 : 6)]);
+        piece.setTexture(piecesTextures[i + 1 + (logicBoard.getCurrentSide() == WHITE ? 0 : 6)]);
         window->draw(piece);
     }
     window->display();
 
     sf::Event event;
     Position click, release;
-    while (1)
+    while (window->isOpen())
     {
         window->pollEvent(event);
         if (event.type == sf::Event::Closed)
@@ -156,4 +156,7 @@ PieceType ChessboardGUI::showPromotion(Side side)
             }
         }
     }
+
+    // This should never happen.
+    return EMPTY;
 }

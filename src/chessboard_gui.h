@@ -27,7 +27,7 @@ class ChessboardGUI
     void updatePieces();
     void highlight(Position from);
     void resetHighlighting();
-	PieceType showPromotion(Side side);
+	PieceType showPromotion();
     ChessboardGUI()
     {
         window = new sf::RenderWindow(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "Chess", sf::Style::Titlebar | sf::Style::Close);

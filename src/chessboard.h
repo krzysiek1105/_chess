@@ -74,8 +74,8 @@ class Chessboard
 	std::vector<Move> getLegalMovesRook(Position position, Position axis, Side side);
 	std::vector<Move> getLegalMovesQueen(Position position, Position axis, Side side);
 	std::vector<Move> getLegalMovesKing(Position position, Side side);
-	std::vector<Move> getLegalMovesAt(Position position);
 	std::vector<Move> getCastling();
+	void getLegalMoves();
 
 	bool arePointsCollinear(Position a, Position b);
 	int piecesBetweenPoints(Position a, Position b);
@@ -90,7 +90,7 @@ class Chessboard
   public:
 	Chessboard();
 	std::vector<Move> legalMoves;
-	void getLegalMoves();
+	std::vector<Move> getLegalMovesAt(Position position);
 	bool makeMove(Position from, Position to);
 	bool makeMove(Side side, bool isKingSideCastle);
 	bool makeMove(PieceType promoted, Position from, Position to);
