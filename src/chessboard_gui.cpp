@@ -62,7 +62,7 @@ void ChessboardGUI::updatePieces()
                 continue;
 
             Piece piece = logicBoard.getPieceAt(Position(x, y));
-            pieces[count].setPosition(x * (WINDOW_SIZE / 8), WINDOW_SIZE - y * (WINDOW_SIZE / 8) - 96);
+            pieces[count].setPosition(x * (WINDOW_SIZE / 8) + ((SQUARE_SIZE - PIECE_SIZE) / 2), WINDOW_SIZE - y * (WINDOW_SIZE / 8) - PIECE_SIZE - ((SQUARE_SIZE - PIECE_SIZE) / 2));
             int type = piece.pieceType + (piece.side == BLACK ? 6 : 0) - 1;
             pieces[count].setTexture(piecesTextures[type]);
             count++;
@@ -123,7 +123,7 @@ PieceType ChessboardGUI::showPromotion(Side side)
     window->draw(background);
     for (int i = 0; i < 4; i++)
     {
-        piece.setPosition((i + 2) * (WINDOW_SIZE / 8), WINDOW_SIZE / 2 - 96);
+        piece.setPosition((i + 2) * (WINDOW_SIZE / 8), WINDOW_SIZE / 2 - PIECE_SIZE);
         piece.setTexture(piecesTextures[i + 1 + (side == WHITE ? 0 : 6)]);
         window->draw(piece);
     }

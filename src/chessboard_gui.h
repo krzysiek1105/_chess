@@ -3,7 +3,9 @@
 #include "chessboard.h"
 #include <SFML/Graphics.hpp>
 
-#define WINDOW_SIZE 928
+#define PIECE_SIZE 80
+#define SQUARE_SIZE 110
+#define WINDOW_SIZE (8 * SQUARE_SIZE)
 
 class ChessboardGUI
 {
