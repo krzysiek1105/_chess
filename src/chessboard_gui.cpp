@@ -157,14 +157,6 @@ PieceType ChessboardGUI::showPromotion(Side side)
 			click = Position(fieldX, fieldY);
 			if (click.y != 4 || click.x < 2 || click.x > 5)
 				continue;
-		}
-		if (event.type == sf::Event::MouseButtonReleased)
-		{
-			int fieldX = (event.mouseButton.x / (float)WINDOW_SIZE) * 8;
-			int fieldY = 8 - (event.mouseButton.y / (float)WINDOW_SIZE) * 8;
-			release = Position(fieldX, fieldY);
-			if (release != click)
-				continue;
 			switch (click.x)
 			{
 			case 2:
