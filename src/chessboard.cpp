@@ -220,8 +220,9 @@ void Chessboard::getLegalMoves()
 			gameState = STALEMATE;
 		else
 		{
-			int counter = 0;
-			bool stalemate = 1;
+			bool knightFound = false;
+			bool stalemate = true;
+			Side bishopSquareColor = NONE;
 			for (int x = 0; x < 8 && stalemate; x++)
 			{
 				for (int y = 0; y < 8; y++)
@@ -229,25 +230,39 @@ void Chessboard::getLegalMoves()
 					PieceType piece = pieces[x][y].pieceType;
 					if (piece == KING || piece == EMPTY)
 						continue;
-					else if (piece == KNIGHT && !counter)
-						counter = 3;
-					else if (piece == BISHOP)
+					else if (knightFound)
 					{
-						int color = x + y % 2 ? 1 : 2;
-						if (counter > 0 && color != counter) {
-							stalemate = 0;
-							break;
-						}
-						counter += color;
-					}
-					else {
 						stalemate = 0;
 						break;
 					}
-
+					else
+					{
+						if (piece == KNIGHT)
+						{
+							if (bishopSquareColor) {
+								stalemate = false;
+								break;
+							}
+							knightFound = 1;
+						}
+						else if (piece == BISHOP)
+						{
+							Side curColor = (x + y) % 2 ? WHITE : BLACK;
+							if (bishopSquareColor && curColor != bishopSquareColor)
+							{
+								stalemate = false;
+								break;
+							}
+							bishopSquareColor = curColor;
+						}
+						else {
+							stalemate = false;
+							break;
+						}
+					}
 				}
 			}
-			if(stalemate)
+			if (stalemate)
 				gameState = STALEMATE;
 		}
 	}
