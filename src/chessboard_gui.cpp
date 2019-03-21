@@ -34,7 +34,7 @@ void ChessboardGUI::setCheckerboard()
                 tmp.setTexture(boardTextures[0]);
             else
                 tmp.setTexture(boardTextures[1]);
-            tmp.setPosition(x * (WINDOW_SIZE / 8), y * (WINDOW_SIZE / 8));
+            tmp.setPosition(x * (CHESSBOARD_SIZE / 8), y * (CHESSBOARD_SIZE / 8));
             squares.push_back(tmp);
         }
     }
@@ -60,7 +60,7 @@ void ChessboardGUI::updatePieces()
                 continue;
 
             Piece piece = logicBoard.getPieceAt(Position(x, y));
-            pieces[count].setPosition(x * (WINDOW_SIZE / 8), WINDOW_SIZE - y * (WINDOW_SIZE / 8) - 96);
+            pieces[count].setPosition(x * (CHESSBOARD_SIZE / 8) + ((SQUARE_SIZE - PIECE_SIZE) / 2), CHESSBOARD_SIZE - y * (CHESSBOARD_SIZE / 8) - PIECE_SIZE - ((SQUARE_SIZE - PIECE_SIZE) / 2));
             int type = piece.pieceType + (piece.side == BLACK ? 6 : 0) - 1;
             pieces[count].setTexture(piecesTextures[type]);
             count++;
@@ -126,4 +126,47 @@ void ChessboardGUI::resetHighlighting()
 {
     for (int i = 0; i < 64; i++)
         squares[i].setColor(sf::Color(255, 255, 255, 255));
+}
+
+PieceType ChessboardGUI::showPromotion()
+{
+    sf::Sprite piece, background;
+    background.setTexture(boardTextures[2]);
+    background.setPosition(2 * (CHESSBOARD_SIZE / 8), CHESSBOARD_SIZE * 3 / 8);
+    window->draw(background);
+    for (int i = 0; i < 4; i++)
+    {
+        piece.setPosition((i + 2) * (CHESSBOARD_SIZE / 8), CHESSBOARD_SIZE / 2 - PIECE_SIZE);
+        piece.setTexture(piecesTextures[i + 1 + (logicBoard.getCurrentSide() == WHITE ? 0 : 6)]);
+        window->draw(piece);
+    }
+    window->display();
+
+    sf::Event event;
+    while (window->isOpen())
+    {
+        window->pollEvent(event);
+        if (event.type == sf::Event::Closed)
+            window->close();
+        if (event.type == sf::Event::MouseButtonPressed)
+        {
+            int fieldX = (event.mouseButton.x / (float)CHESSBOARD_SIZE) * 8;
+            int fieldY = 8 - (event.mouseButton.y / (float)CHESSBOARD_SIZE) * 8;
+			if (fieldY != 4)
+				return EMPTY;
+            switch (fieldX)
+            {
+            case 2:
+                return BISHOP;
+            case 3:
+                return KNIGHT;
+            case 4:
+                return ROOK;
+            case 5:
+                return QUEEN;
+			default:
+				return EMPTY;
+            }
+        }
+    }
 }

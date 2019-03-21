@@ -229,6 +229,7 @@ bool Chessboard::makeMove(Position from, Position to)
 		if (from == move.from && to == move.to && move.moveType != PAWN_PROMOTION)
 		{
 			found = true;
+			moveHistory.push_back(move);
 			break;
 		}
 	if (!found)
@@ -297,6 +298,7 @@ bool Chessboard::makeMove(Side side, bool isKingSideCastle)
 			movesDone++;
 
 			getLegalMoves();
+			moveHistory.push_back(move);
 			return true;
 		}
 
@@ -316,6 +318,7 @@ bool Chessboard::makeMove(PieceType promoted, Position from, Position to)
 		if (move.from == from && move.moveType == PAWN_PROMOTION && to == move.to)
 		{
 			found = true;
+			moveHistory.push_back(move);
 			break;
 		}
 	if (!found)

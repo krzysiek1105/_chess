@@ -3,7 +3,11 @@
 #include "chessboard.h"
 #include <SFML/Graphics.hpp>
 
-#define WINDOW_SIZE 929
+#define PIECE_SIZE 80
+#define SQUARE_SIZE 110
+#define CHESSBOARD_SIZE (8 * SQUARE_SIZE)
+#define SIDE_PANEL_WIDTH 240
+#define SIDE_PANEL_PADDING 25
 
 class ChessboardGUI
 {
@@ -28,7 +32,7 @@ class ChessboardGUI
 
     ChessboardGUI()
     {
-        window = new sf::RenderWindow(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "Chess", sf::Style::Titlebar | sf::Style::Close);
+        window = new sf::RenderWindow(sf::VideoMode(CHESSBOARD_SIZE + SIDE_PANEL_WIDTH, CHESSBOARD_SIZE), "Chess", sf::Style::Titlebar | sf::Style::Close);
         window->setFramerateLimit(30);
 
         loadPiecesTextures();
