@@ -39,15 +39,15 @@ std::vector<Chessboard::Move> Chessboard::getLegalMovesPawn(Position position, P
 				if (!guardian || axis.x * axis.y == horizontal * direction)
 				{
 					if ((current_y == 7 && side == WHITE) || (current_y == 0 && side == BLACK))
-						result.push_back(Move(PAWN_PROMOTION, position, Position(current_x, current_y)));
+						result.push_back(Move(PAWN_PROMOTION_WITH_BEATING, position, Position(current_x, current_y)));
 					else
-						result.push_back(Move(position, Position(current_x, current_y)));
+						result.push_back(Move(BEATING, position, Position(current_x, current_y)));
 				}
 			}
 			//en passant
 			else if (pieces[current_x][current_y].pieceType == EMPTY && pieces[current_x][current_y - direction].pieceType == PAWN && lastMove.x == current_x && lastMove.y == current_y - direction && pieces[lastMove.x][lastMove.y].twoSquares)
 				if (!guardian || axis.x * axis.y == horizontal * direction)
-					result.push_back(Move(position, Position(current_x, current_y)));
+					result.push_back(Move(EN_PASSANT, position, Position(current_x, current_y)));
 		}
 	}
 	return result;
@@ -69,8 +69,10 @@ std::vector<Chessboard::Move> Chessboard::getLegalMovesKnight(Position position,
 				int current_y = position.y + vertical * (x == -2 ? 1 : 2);
 				if (current_x < 0 || current_x > 7 || current_y < 0 || current_y > 7)
 					continue;
-				if (pieces[current_x][current_y].pieceType == EMPTY || pieces[current_x][current_y].side == side * -1)
+				if (pieces[current_x][current_y].pieceType == EMPTY)
 					result.push_back(Move(position, Position(current_x, current_y)));
+				else if (pieces[current_x][current_y].side == side * -1)
+					result.push_back(Move(BEATING, position, Position(current_x, current_y)));
 			}
 		}
 	}
@@ -101,7 +103,7 @@ std::vector<Chessboard::Move> Chessboard::getLegalMovesBishop(Position position,
 					continue;
 				}
 				if (pieces[current_x][current_y].side == side * -1)
-					result.push_back(Move(position, Position(current_x, current_y)));
+					result.push_back(Move(BEATING, position, Position(current_x, current_y)));
 				break;
 			}
 		}
@@ -139,7 +141,7 @@ std::vector<Chessboard::Move> Chessboard::getLegalMovesRook(Position position, P
 				continue;
 			}
 			else if (pieces[current_x][current_y].side == side * -1)
-				result.push_back(Move(position, Position(current_x, current_y)));
+				result.push_back(Move(BEATING, position, Position(current_x, current_y)));
 			break;
 		}
 	}
@@ -167,8 +169,10 @@ std::vector<Chessboard::Move> Chessboard::getLegalMovesKing(Position position, S
 			int current_y = position.y + vertical;
 			if (current_x < 0 || current_x > 7 || current_y < 0 || current_y > 7)
 				continue;
-			if (pieces[current_x][current_y].pieceType == EMPTY || pieces[current_x][current_y].side == side * -1)
+			if (pieces[current_x][current_y].pieceType == EMPTY)
 				result.push_back(Move(position, Position(current_x, current_y)));
+			else if (pieces[current_x][current_y].side == side * -1)
+				result.push_back(Move(BEATING, position, Position(current_x, current_y)));
 		}
 	}
 	return result;

@@ -14,11 +14,15 @@ class Chessboard
 		NORMAL,
 		CASTLING,
 		EN_PASSANT,
-		PAWN_PROMOTION
+		PAWN_PROMOTION,
+		PAWN_PROMOTION_WITH_BEATING,
+		BEATING
 	} MoveType;
 
 	typedef struct move_t
 	{
+		PieceType pieceOnMove;
+
 		MoveType moveType;
 		Position from;
 		Position to;

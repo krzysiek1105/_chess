@@ -369,7 +369,9 @@ bool Chessboard::makeMove(PieceType promoted, Position from, Position to)
 		if (move.from == from && move.moveType == PAWN_PROMOTION && to == move.to)
 		{
 			found = true;
-			moveHistory.push_back(move);
+			Move m = move;
+			m.pieceType = promoted;
+			moveHistory.push_back(m);
 			break;
 		}
 	if (!found)
