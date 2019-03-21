@@ -130,7 +130,6 @@ PieceType ChessboardGUI::showPromotion()
     window->display();
 
     sf::Event event;
-    Position click, release;
     while (window->isOpen())
     {
         window->pollEvent(event);
@@ -140,10 +139,9 @@ PieceType ChessboardGUI::showPromotion()
         {
             int fieldX = (event.mouseButton.x / (float)WINDOW_SIZE) * 8;
             int fieldY = 8 - (event.mouseButton.y / (float)WINDOW_SIZE) * 8;
-            click = Position(fieldX, fieldY);
-            if (click.y != 4 || click.x < 2 || click.x > 5)
-                continue;
-            switch (click.x)
+			if (fieldY != 4)
+				return EMPTY;
+            switch (fieldX)
             {
             case 2:
                 return BISHOP;
@@ -153,10 +151,9 @@ PieceType ChessboardGUI::showPromotion()
                 return ROOK;
             case 5:
                 return QUEEN;
+			default:
+				return EMPTY;
             }
         }
     }
-
-    // This should never happen.
-    return EMPTY;
 }
