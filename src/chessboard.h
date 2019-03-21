@@ -98,4 +98,6 @@ class Chessboard
 	GameState getGameState();
 	Side getCurrentSide();
 	Piece getPieceAt(Position position);
+
+	std::vector<Move> moveHistory;
 };
