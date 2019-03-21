@@ -87,16 +87,37 @@ int main()
 
 					if (moveNumber % 2 != 0)
 						moves.append(std::to_string(moveNumber / 2 + 1) + ". ");
-					std::string toString;
-					toString += "abcdefgh"[lastMove.to.x];
-					toString += "12345678"[lastMove.to.y];
-					moves.append(toString);
+
+					if (lastMove.moveType != Chessboard::CASTLING)
+					{
+						if (lastMove.pieceOnMove != PAWN)
+							moves += " PBNRQK"[lastMove.pieceOnMove];
+						if (lastMove.moveType == Chessboard::BEATING)
+						{
+							if (lastMove.pieceOnMove == PAWN)
+								moves += "abcdefgh"[lastMove.from.x];
+							moves += "x";
+						}
+
+						std::string toString;
+						toString += "abcdefgh"[lastMove.to.x];
+						toString += "12345678"[lastMove.to.y];
+						moves.append(toString);
 						moves.append(moveNumber % 2 != 0 ? " " : "\n");
+					}
+					else if (lastMove.moveType == Chessboard::CASTLING)
+					{
+						if (lastMove.kingSideCastle)
+							moves.append("O-O");
+						else
+							moves.append("O-O-O");
+					}
+					if (chessboardGUI.logicBoard.getGameState() == Chessboard::CHECK)
+						moves += '+';
 
 					std::cout << fromString << " " << toString << std::endl;
 					std::cout << chessboardGUI.logicBoard;
 					chessboardGUI.updatePieces();
-					chessboardGUI.resetHighlighting();
 
 					std::string windowTitle = chessboardGUI.logicBoard.getCurrentSide() == WHITE ? "White move " : "Black move ";
 					switch (chessboardGUI.logicBoard.getGameState())
@@ -113,6 +134,7 @@ int main()
 					}
 					chessboardGUI.window->setTitle(windowTitle);
 				}
+				chessboardGUI.resetHighlighting();
 			}
 		}
 

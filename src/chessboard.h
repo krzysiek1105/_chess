@@ -33,11 +33,12 @@ class Chessboard
 		PieceType pieceType;
 
 		// That's all we need if moveType is NORMAL
-		move_t(Position from, Position to)
+		move_t(Position from, Position to, PieceType pieceOnMove)
 		{
 			moveType = NORMAL;
 			this->from = from;
 			this->to = to;
+			this->pieceOnMove = pieceOnMove;
 		}
 
 		// If moveType is CASTLING
@@ -48,11 +49,12 @@ class Chessboard
 			this->kingSideCastle = kingSideCastle;
 		}
 
-		move_t(MoveType moveType, Position from, Position to)
+		move_t(MoveType moveType, Position from, Position to, PieceType pieceOnMove)
 		{
 			this->moveType = moveType;
 			this->from = from;
 			this->to = to;
+			this->pieceOnMove = pieceOnMove;
 		}
 	} Move;
 
