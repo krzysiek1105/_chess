@@ -30,15 +30,19 @@ int main()
 			{
 				from.x = (event.mouseButton.x / (float)CHESSBOARD_SIZE) * 8;
 				from.y = 8 - (event.mouseButton.y / (float)CHESSBOARD_SIZE) * 8;
-
+				if (from.x >= 8)
+					continue;
 				chessboardGUI.highlight(from);
 			}
 
 			if (event.type == sf::Event::MouseButtonReleased)
 			{
+				if (from.x >= 8)
+					continue;
 				to.x = (event.mouseButton.x / (float)CHESSBOARD_SIZE) * 8;
 				to.y = 8 - (event.mouseButton.y / (float)CHESSBOARD_SIZE) * 8;
-
+				if (to.x >= 8)
+					continue;
 				std::string fromString;
 				fromString += "abcdefgh"[from.x];
 				fromString += "12345678"[from.y];
@@ -48,13 +52,13 @@ int main()
 				toString += "12345678"[to.y];
 
 				bool successfulMove = false;
-				if (fromString == "e1" && toString == "h1")
+				if (fromString == "e1" && (toString == "h1" || toString == "g1"))
 					successfulMove = chessboardGUI.logicBoard.makeMove(WHITE, true);
-				else if (fromString == "e1" && toString == "a1")
+				else if (fromString == "e1" && (toString == "a1" || toString == "c1"))
 					successfulMove = chessboardGUI.logicBoard.makeMove(WHITE, false);
-				else if (fromString == "e8" && toString == "h8")
+				else if (fromString == "e8" && (toString == "h8" || toString == "g8"))
 					successfulMove = chessboardGUI.logicBoard.makeMove(BLACK, true);
-				else if (fromString == "e8" && toString == "a8")
+				else if (fromString == "e8" && (toString == "a8" || toString == "c8"))
 					successfulMove = chessboardGUI.logicBoard.makeMove(BLACK, false);
 				else
 				{
@@ -64,7 +68,7 @@ int main()
 						bool canBePromoted = false;
 						std::vector<Chessboard::Move> moves = chessboardGUI.logicBoard.getLegalMovesAt(from);
 						for (Chessboard::Move move : moves)
-							if (move.moveType == Chessboard::PAWN_PROMOTION && move.from == from && move.to == to)
+							if ((move.moveType == Chessboard::PAWN_PROMOTION || move.moveType == Chessboard::PAWN_PROMOTION_WITH_BEATING) && move.from == from && move.to == to)
 							{
 								canBePromoted = true;
 								break;
@@ -86,34 +90,39 @@ int main()
 					Chessboard::Move lastMove = chessboardGUI.logicBoard.moveHistory[moveNumber - 1];
 
 					if (moveNumber % 2 != 0)
-						moves.append(std::to_string(moveNumber / 2 + 1) + ". ");
+						moves += std::to_string(moveNumber / 2 + 1) + ". ";
 
 					if (lastMove.moveType != Chessboard::CASTLING)
 					{
-						if (lastMove.pieceOnMove != PAWN)
+						if (lastMove.pieceOnMove != PAWN) {
 							moves += " PBNRQK"[lastMove.pieceOnMove];
-						if (lastMove.moveType == Chessboard::BEATING)
+						}
+						if (lastMove.moveType == Chessboard::BEATING || lastMove.moveType == Chessboard::PAWN_PROMOTION_WITH_BEATING || lastMove.moveType == Chessboard::EN_PASSANT)
 						{
 							if (lastMove.pieceOnMove == PAWN)
 								moves += "abcdefgh"[lastMove.from.x];
 							moves += "x";
 						}
-
-						std::string toString;
-						toString += "abcdefgh"[lastMove.to.x];
-						toString += "12345678"[lastMove.to.y];
-						moves.append(toString);
-						moves.append(moveNumber % 2 != 0 ? " " : "\n");
+						moves += "abcdefgh"[lastMove.to.x];
+						moves += "12345678"[lastMove.to.y];
+					}
+					if (lastMove.moveType == Chessboard::PAWN_PROMOTION || lastMove.moveType == Chessboard::PAWN_PROMOTION_WITH_BEATING)
+					{
+						moves += "=";
+						moves += " PBNRQK"[chessboardGUI.logicBoard.getPieceAt(to).pieceType];
 					}
 					else if (lastMove.moveType == Chessboard::CASTLING)
 					{
 						if (lastMove.kingSideCastle)
-							moves.append("O-O");
+							moves += "O-O";
 						else
-							moves.append("O-O-O");
+							moves += "O-O-O";
 					}
 					if (chessboardGUI.logicBoard.getGameState() == Chessboard::CHECK)
 						moves += '+';
+					if (chessboardGUI.logicBoard.getGameState() == Chessboard::MATE)
+						moves += '#';
+					moves += moveNumber % 2 != 0 ? "  " : "\n";
 
 					std::cout << fromString << " " << toString << std::endl;
 					std::cout << chessboardGUI.logicBoard;

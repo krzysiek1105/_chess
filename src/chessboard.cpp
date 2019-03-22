@@ -359,14 +359,13 @@ bool Chessboard::makeMove(Side side, bool isKingSideCastle)
 bool Chessboard::makeMove(PieceType promoted, Position from, Position to)
 {
 	if (!(pieces[from.x][from.y].pieceType == PAWN && promoted != EMPTY && promoted != PAWN && promoted != KING))
-
 		return false;
 	if ((!(movesDone % 2) && pieces[from.x][from.y].side != WHITE) || (movesDone % 2 && pieces[from.x][from.y].side != BLACK))
 		return false;
 
 	bool found = false;
 	for (Move move : legalMoves)
-		if (move.from == from && move.moveType == PAWN_PROMOTION && to == move.to)
+		if (move.from == from && (move.moveType == PAWN_PROMOTION || move.moveType == PAWN_PROMOTION_WITH_BEATING) && to == move.to)
 		{
 			found = true;
 			Move m = move;
