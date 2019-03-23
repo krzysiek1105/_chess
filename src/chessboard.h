@@ -82,6 +82,7 @@ class Chessboard
 	Position whiteKing;
 	Position blackKing;
 	GameState gameState;
+	std::string sanString;
 
 	std::vector<Move> getLegalMovesPawn(Position position, Position axis, Side side);
 	std::vector<Move> getLegalMovesKnight(Position position, Position axis, Side side);
@@ -113,6 +114,7 @@ class Chessboard
 	Side getCurrentSide();
 	Piece getPieceAt(Position position);
 	void getLegalMoves();
-
+	void setSanString(PieceType promotion);
+	std::string getSanString();
 	std::vector<Move> moveHistory;
 };

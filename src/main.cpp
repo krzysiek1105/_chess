@@ -16,7 +16,7 @@ int main()
 	moveList.setFont(font);
 	moveList.setFillColor(sf::Color(118, 77, 46, 255));
 	moveList.setPosition(CHESSBOARD_SIZE + SIDE_PANEL_PADDING, SIDE_PANEL_PADDING);
-	std::string moves;
+	std::string moves = "";
 
 	while (chessboardGUI.window->isOpen())
 	{
@@ -85,51 +85,8 @@ int main()
 				}
 
 				if (successfulMove)
-				{
-					int moveNumber = chessboardGUI.logicBoard.moveHistory.size();
-					Chessboard::Move lastMove = chessboardGUI.logicBoard.moveHistory[moveNumber - 1];
-
-					if (moveNumber % 2 != 0)
-						moves += std::to_string(moveNumber / 2 + 1) + ". ";
-
-					if (lastMove.moveType != Chessboard::CASTLING)
-					{
-						if (lastMove.pieceOnMove != PAWN) {
-							moves += " PBNRQK"[lastMove.pieceOnMove];
-						}
-						if(lastMove.ambiguousX == true)
-							moves += "abcdefgh"[lastMove.from.x];
-						if(lastMove.ambiguousY == true)
-							moves += "12345678"[lastMove.from.y];
-						if (lastMove.moveType == Chessboard::BEATING || lastMove.moveType == Chessboard::PAWN_PROMOTION_WITH_BEATING || lastMove.moveType == Chessboard::EN_PASSANT)
-						{
-							if (lastMove.pieceOnMove == PAWN)
-								moves += "abcdefgh"[lastMove.from.x];
-							moves += "x";
-						}
-						moves += "abcdefgh"[lastMove.to.x];
-						moves += "12345678"[lastMove.to.y];
-					}
-					if (lastMove.moveType == Chessboard::PAWN_PROMOTION || lastMove.moveType == Chessboard::PAWN_PROMOTION_WITH_BEATING)
-					{
-						moves += "=";
-						moves += " PBNRQK"[chessboardGUI.logicBoard.getPieceAt(to).pieceType];
-					}
-					else if (lastMove.moveType == Chessboard::CASTLING)
-					{
-						if (lastMove.kingSideCastle)
-							moves += "O-O";
-						else
-							moves += "O-O-O";
-					}
-					chessboardGUI.logicBoard.getLegalMoves();
-					
-					if (chessboardGUI.logicBoard.getGameState() == Chessboard::CHECK)
-						moves += '+';
-					if (chessboardGUI.logicBoard.getGameState() == Chessboard::MATE)
-						moves += '#';
-					moves += moveNumber % 2 != 0 ? "  " : "\n";
-
+				{ 
+					moves += chessboardGUI.logicBoard.getSanString();
 					std::cout << fromString << " " << toString << std::endl;
 					std::cout << chessboardGUI.logicBoard;
 					chessboardGUI.updatePieces();
@@ -158,7 +115,7 @@ int main()
 			chessboardGUI.window->draw(chessboardGUI.squares[i]);
 		for (int i = 0; i < chessboardGUI.piecesOnBoard; i++)
 			chessboardGUI.window->draw(chessboardGUI.pieces[i]);
-
+		
 		moveList.setString(moves);
 		chessboardGUI.window->draw(moveList);
 		chessboardGUI.window->display();
