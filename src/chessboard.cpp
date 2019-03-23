@@ -270,7 +270,7 @@ void Chessboard::getLegalMoves()
 	for (Move &m1 : result)
 		for (Move &m2 : result)
 		{
-			if (!(m1.from == m2.from) && m1.side == m2.side && m1.pieceOnMove == m2.pieceOnMove && m1.to == m2.to)
+			if (!(m1.from == m2.from) && m1.pieceOnMove == m2.pieceOnMove && m1.to == m2.to)
 			{
 				if(m1.from.x == m2.from.x)
 				{
@@ -301,11 +301,11 @@ void Chessboard::setSanString(PieceType promotion)
 	{
 		if (lastMove.pieceOnMove != PAWN) {
 			sanString += " PBNRQK"[lastMove.pieceOnMove];
+			if (lastMove.ambiguousX == true)
+				sanString += "abcdefgh"[lastMove.from.x];
+			if (lastMove.ambiguousY == true)
+				sanString += "12345678"[lastMove.from.y];
 		}
-		if (lastMove.ambiguousX == true)
-			sanString += "abcdefgh"[lastMove.from.x];
-		if (lastMove.ambiguousY == true)
-			sanString += "12345678"[lastMove.from.y];
 		if (lastMove.moveType == Chessboard::BEATING || lastMove.moveType == Chessboard::PAWN_PROMOTION_WITH_BEATING || lastMove.moveType == Chessboard::EN_PASSANT)
 		{
 			if (lastMove.pieceOnMove == PAWN)
