@@ -8,6 +8,7 @@
 #define CHESSBOARD_SIZE (8 * SQUARE_SIZE)
 #define SIDE_PANEL_WIDTH 240
 #define SIDE_PANEL_PADDING 25
+#define MOVE_HISTORY_LINE_COUNT 5
 
 class ChessboardGUI
 {
