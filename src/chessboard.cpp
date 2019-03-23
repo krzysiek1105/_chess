@@ -267,6 +267,25 @@ void Chessboard::getLegalMoves()
 		}
 	}
 
+	for (Move &m1 : result)
+		for (Move &m2 : result)
+		{
+			if (!(m1.from == m2.from) && m1.side == m2.side && m1.pieceOnMove == m2.pieceOnMove && m1.to == m2.to)
+			{
+				if(m1.from.x == m2.from.x)
+				{
+					m1.ambiguousY = true;
+					m2.ambiguousY = true;
+				}
+				if (m1.from.y == m2.from.y)
+				{
+					m1.ambiguousX = true;
+					m2.ambiguousX = true;
+				}
+				
+			}
+		}
+
 	legalMoves = result;
 }
 
@@ -313,7 +332,6 @@ bool Chessboard::makeMove(Position from, Position to)
 	lastMove = to;
 	movesDone++;
 
-	getLegalMoves();
 	return true;
 }
 
@@ -348,7 +366,6 @@ bool Chessboard::makeMove(Side side, bool isKingSideCastle)
 			lastMove = Position(new_king_x, y);
 			movesDone++;
 
-			getLegalMoves();
 			moveHistory.push_back(move);
 			return true;
 		}
@@ -381,7 +398,6 @@ bool Chessboard::makeMove(PieceType promoted, Position from, Position to)
 	lastMove = to;
 	movesDone++;
 
-	getLegalMoves();
 	return true;
 }
 

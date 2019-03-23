@@ -97,6 +97,10 @@ int main()
 						if (lastMove.pieceOnMove != PAWN) {
 							moves += " PBNRQK"[lastMove.pieceOnMove];
 						}
+						if(lastMove.ambiguousX == true)
+							moves += "abcdefgh"[lastMove.from.x];
+						if(lastMove.ambiguousY == true)
+							moves += "12345678"[lastMove.from.y];
 						if (lastMove.moveType == Chessboard::BEATING || lastMove.moveType == Chessboard::PAWN_PROMOTION_WITH_BEATING || lastMove.moveType == Chessboard::EN_PASSANT)
 						{
 							if (lastMove.pieceOnMove == PAWN)
@@ -118,6 +122,8 @@ int main()
 						else
 							moves += "O-O-O";
 					}
+					chessboardGUI.logicBoard.getLegalMoves();
+					
 					if (chessboardGUI.logicBoard.getGameState() == Chessboard::CHECK)
 						moves += '+';
 					if (chessboardGUI.logicBoard.getGameState() == Chessboard::MATE)

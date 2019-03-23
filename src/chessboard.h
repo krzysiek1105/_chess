@@ -31,6 +31,9 @@ class Chessboard
 		bool kingSideCastle;
 		// Used if moveType is PAWN_PROMOTION
 		PieceType pieceType;
+		// Used in SAN notation to determine if it is a need to put row/column in output string
+		bool ambiguousX;
+		bool ambiguousY;
 
 		// That's all we need if moveType is NORMAL
 		move_t(Position from, Position to, PieceType pieceOnMove)
@@ -39,6 +42,8 @@ class Chessboard
 			this->from = from;
 			this->to = to;
 			this->pieceOnMove = pieceOnMove;
+			ambiguousX = false;
+			ambiguousY = false;
 		}
 
 		// If moveType is CASTLING
@@ -47,6 +52,8 @@ class Chessboard
 			moveType = CASTLING;
 			this->side = side;
 			this->kingSideCastle = kingSideCastle;
+			ambiguousX = false;
+			ambiguousY = false;
 		}
 
 		move_t(MoveType moveType, Position from, Position to, PieceType pieceOnMove)
@@ -55,6 +62,8 @@ class Chessboard
 			this->from = from;
 			this->to = to;
 			this->pieceOnMove = pieceOnMove;
+			ambiguousX = false;
+			ambiguousY = false;
 		}
 	} Move;
 
@@ -81,7 +90,6 @@ class Chessboard
 	std::vector<Move> getLegalMovesQueen(Position position, Position axis, Side side);
 	std::vector<Move> getLegalMovesKing(Position position, Side side);
 	std::vector<Move> getCastling();
-	void getLegalMoves();
 
 	bool arePointsCollinear(Position a, Position b);
 	int piecesBetweenPoints(Position a, Position b);
@@ -104,6 +112,7 @@ class Chessboard
 	GameState getGameState();
 	Side getCurrentSide();
 	Piece getPieceAt(Position position);
+	void getLegalMoves();
 
 	std::vector<Move> moveHistory;
 };
