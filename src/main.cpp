@@ -73,7 +73,7 @@ int main()
 				else
 				{
 					Piece currentPiece = chessboardGUI.logicBoard.getPieceAt(from);
-					if (currentPiece.pieceType == PAWN && currentPiece.side == chessboardGUI.logicBoard.getCurrentSide() && (to.y == 0 || to.y == 7))
+					if (chessboardGUI.logicBoard.getGameState() == Chessboard::IN_GAME && currentPiece.pieceType == PAWN && currentPiece.side == chessboardGUI.logicBoard.getCurrentSide() && (to.y == 0 || to.y == 7))
 					{
 						bool canBePromoted = false;
 						std::vector<Chessboard::Move> moves = chessboardGUI.logicBoard.getLegalMovesAt(from);

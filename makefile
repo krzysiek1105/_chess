@@ -7,7 +7,7 @@ ISFML = D:/SFML-2.5.1/include
 LDIR = D:/SFML-2.5.1/lib
 LIBS = -lsfml-graphics -lsfml-system -lsfml-window
 
-LOGIC_OBJS = chessboard.o piece_legal_moves.o chessboard_utils.o chessboard_checks.o
+LOGIC_OBJS = chessboard.o piece_legal_moves.o chessboard_utils.o chessboard_checks.o chessboard_notations.o
 GUI_OBJS = chessboard_gui.o main.o
 
 all: $(LOGIC_OBJS) $(GUI_OBJS)
