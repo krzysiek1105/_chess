@@ -2,6 +2,11 @@
 
 Chessboard::Chessboard()
 {
+	reset();
+}
+
+void Chessboard::reset()
+{
 	movesDone = 0;
 	lastMove = Position(0, 0);
 	whiteKing = Position(4, 0);
@@ -45,6 +50,10 @@ Chessboard::Chessboard()
 	for (int x = 0; x < 8; x++)
 		for (int y = 2; y < 6; y++)
 			pieces[x][y] = Piece();
+
+	moveHistory.clear();
+	sanString = "";
+	gameState = IN_GAME;
 
 	getLegalMoves();
 }

@@ -157,3 +157,11 @@ PieceType ChessboardGUI::showPromotion()
         }
     }
 }
+
+void ChessboardGUI::resetAll()
+{
+    logicBoard.reset();
+    updatePieces();
+    resetHighlighting();
+    sanMoves.clear();
+}

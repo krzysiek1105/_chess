@@ -12,7 +12,6 @@ int main()
 	sf::Font font;
 	if (!font.loadFromFile("arial.ttf"))
 		return 1;
-	std::vector<std::string> sanMoves;
 	int startHistory = 0;
 
 	while (chessboardGUI.window->isOpen())
@@ -20,19 +19,21 @@ int main()
 		sf::Event event;
 		while (chessboardGUI.window->pollEvent(event))
 		{
+			chessboardGUI.gui.handleEvent(event);
+
 			if (event.type == sf::Event::Closed)
 				chessboardGUI.window->close();
 
 			if (event.type == sf::Event::MouseWheelScrolled)
 			{
-				if (sanMoves.size() >= MOVE_HISTORY_LINE_COUNT)
+				if (chessboardGUI.sanMoves.size() >= MOVE_HISTORY_LINE_COUNT)
 				{
 					int delta = event.mouseWheelScroll.delta;
 					startHistory += event.mouseWheelScroll.delta;
 					if (startHistory < 0)
 						startHistory = 0;
-					if (startHistory > sanMoves.size() - 1)
-						startHistory = sanMoves.size() - 1;
+					if (startHistory > chessboardGUI.sanMoves.size() - 1)
+						startHistory = chessboardGUI.sanMoves.size() - 1;
 				}
 			}
 
@@ -98,12 +99,12 @@ int main()
 				{
 					if (chessboardGUI.logicBoard.moveHistory.size() % 2 != 0)
 					{
-						sanMoves.push_back(chessboardGUI.logicBoard.getSanString());
-						if (sanMoves.size() > MOVE_HISTORY_LINE_COUNT)
-							startHistory = sanMoves.size() - MOVE_HISTORY_LINE_COUNT;
+						chessboardGUI.sanMoves.push_back(chessboardGUI.logicBoard.getSanString());
+						if (chessboardGUI.sanMoves.size() > MOVE_HISTORY_LINE_COUNT)
+							startHistory = chessboardGUI.sanMoves.size() - MOVE_HISTORY_LINE_COUNT;
 					}
 					else
-						sanMoves[sanMoves.size() - 1] += chessboardGUI.logicBoard.getSanString();
+						chessboardGUI.sanMoves[chessboardGUI.sanMoves.size() - 1] += chessboardGUI.logicBoard.getSanString();
 
 					std::cout << fromString << " " << toString << std::endl;
 					std::cout << chessboardGUI.logicBoard;
@@ -138,19 +139,20 @@ int main()
 		for (int i = 0; i < MOVE_HISTORY_LINE_COUNT; i++)
 		{
 			int j = i + startHistory;
-			if (j >= sanMoves.size())
+			if (j >= chessboardGUI.sanMoves.size())
 				break;
 			sf::Text tmp;
 			tmp.setFont(font);
 			tmp.setFillColor(sf::Color(118, 77, 46, 255));
 			tmp.setPosition(CHESSBOARD_SIZE + SIDE_PANEL_PADDING, SIDE_PANEL_PADDING * (i + 1));
-			tmp.setString(sanMoves[j]);
+			tmp.setString(chessboardGUI.sanMoves[j]);
 
 			sanMovesText.push_back(tmp);
 		}
 		for (sf::Text &text : sanMovesText)
 			chessboardGUI.window->draw(text);
 
+		chessboardGUI.gui.draw();
 		chessboardGUI.window->display();
 	}
 

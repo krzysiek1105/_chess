@@ -117,4 +117,5 @@ class Chessboard
 	void setSanString(PieceType promotion);
 	std::string getSanString();
 	std::vector<Move> moveHistory;
+	void reset();
 };

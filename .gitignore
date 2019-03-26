@@ -4,3 +4,4 @@
 *.exe
 src/makefile
 *.o
+*.dll
