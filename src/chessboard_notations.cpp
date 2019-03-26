@@ -105,6 +105,8 @@ Chessboard::Move Chessboard::moveFromSAN(std::string san)
                 column = san[0];
 
             MoveType moveType = NORMAL;
+			if (isPromoted)
+				moveType = PAWN_PROMOTION;
             if (isBeating)
             {
                 if (isPromoted)
@@ -128,7 +130,7 @@ Chessboard::Move Chessboard::moveFromSAN(std::string san)
     return Chessboard::Move(Position(), Position(), EMPTY);
 }
 
-std::vector<Chessboard::Move> movesFromPGN(std::string pgn)
+std::vector<Chessboard::Move> Chessboard::movesFromPGN(std::string pgn)
 {
     std::vector<Chessboard::Move> result;
     std::istringstream iss(pgn);
@@ -142,6 +144,7 @@ std::vector<Chessboard::Move> movesFromPGN(std::string pgn)
         token.erase(token.find_last_not_of(' ') + 1);
 
         Chessboard::Move tmp = Chessboard::moveFromSAN(token);
+		Chessboard::makeMove(tmp);
         result.push_back(tmp);
     }
 
