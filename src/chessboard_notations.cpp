@@ -51,3 +51,84 @@ std::string Chessboard::getSanString()
 {
     return sanString;
 }
+
+Chessboard::Move Chessboard::moveFromSAN(std::string san)
+{
+    if (san == "O-O")
+    {
+        for (Move &m : legalMoves)
+            if (m.moveType == Chessboard::CASTLING && m.kingSideCastle)
+                return m;
+    }
+    else if (san == "O-O-O")
+    {
+        for (Move &m : legalMoves)
+            if (m.moveType == Chessboard::CASTLING && !m.kingSideCastle)
+                return m;
+    }
+    else
+    {
+        int isBeating = !!(san.find("x") != std::string::npos);
+        if (san.find_first_of("BNRQK") != std::string::npos)
+        {
+            PieceType pieceType;
+            switch (san[0])
+            {
+            case 'B':
+                pieceType = BISHOP;
+                break;
+            case 'N':
+                pieceType = KNIGHT;
+                break;
+            case 'R':
+                pieceType = ROOK;
+                break;
+            case 'Q':
+                pieceType = QUEEN;
+                break;
+            case 'K':
+                pieceType = KING;
+                break;
+            }
+            Position to(san[1 + isBeating] - 'a', san[2 + isBeating] - '1');
+
+            for (Move &m : legalMoves)
+                if ((m.moveType == isBeating ? Chessboard::BEATING : Chessboard::NORMAL) && m.to == to && m.pieceOnMove == pieceType)
+                    return m;
+        }
+        else // It's a pawn move.
+        {
+            bool isPromoted = (san.find("=") != std::string::npos);
+            Position to(san[0 + isBeating * 2] - 'a', san[1 + isBeating * 2] - '1');
+            int column;
+            if (isBeating)
+                column = san[0];
+
+            MoveType moveType = NORMAL;
+            if (isBeating)
+            {
+                if (isPromoted)
+                    moveType = PAWN_PROMOTION_WITH_BEATING;
+                else
+                    moveType = BEATING;
+            }
+
+            for (Move &m : legalMoves)
+            {
+                if ((m.moveType == moveType || m.moveType == EN_PASSANT) && m.to == to)
+                {
+                    if (isBeating && m.from.x != column)
+                        continue;
+                    return m;
+                }
+            }
+        }
+    }
+
+    return Chessboard::Move(Position(), Position(), EMPTY);
+}
+
+std::vector<Chessboard::Move> movesFromPGN(std::string pgn)
+{
+    
+}

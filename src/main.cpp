@@ -6,6 +6,19 @@ int main()
 {
 	ChessboardGUI chessboardGUI;
 
+	chessboardGUI.logicBoard.makeMove("e4");
+	chessboardGUI.logicBoard.makeMove("e5");
+	chessboardGUI.logicBoard.makeMove("Nf3");
+	chessboardGUI.logicBoard.makeMove("Nc6");
+	chessboardGUI.logicBoard.makeMove("Bb5");
+	chessboardGUI.logicBoard.makeMove("a6");
+	chessboardGUI.logicBoard.makeMove("Ba4");
+	chessboardGUI.logicBoard.makeMove("Nf6");
+	chessboardGUI.logicBoard.makeMove("O-O");
+	chessboardGUI.logicBoard.makeMove("Be7");
+
+	chessboardGUI.updatePieces();
+
 	Position from;
 	Position to;
 

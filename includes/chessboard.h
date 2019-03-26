@@ -109,6 +109,8 @@ class Chessboard
 	bool makeMove(Position from, Position to);
 	bool makeMove(Side side, bool isKingSideCastle);
 	bool makeMove(PieceType promoted, Position from, Position to);
+	bool makeMove(Move);
+	bool makeMove(std::string pgn);
 	friend std::ostream &operator<<(std::ostream &s, const Chessboard &c);
 	GameState getGameState();
 	Side getCurrentSide();
@@ -118,4 +120,6 @@ class Chessboard
 	std::string getSanString();
 	std::vector<Move> moveHistory;
 	void reset();
+	Move moveFromSAN(std::string san);
+	std::vector<Move> movesFromPGN(std::string pgn);
 };
