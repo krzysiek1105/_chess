@@ -5,6 +5,7 @@
 #include <string>
 #include <cstdlib>
 #include <utility>
+#include <sstream>
 
 class Chessboard
 {

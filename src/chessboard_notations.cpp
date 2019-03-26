@@ -130,5 +130,20 @@ Chessboard::Move Chessboard::moveFromSAN(std::string san)
 
 std::vector<Chessboard::Move> movesFromPGN(std::string pgn)
 {
-    
+    std::vector<Chessboard::Move> result;
+    std::istringstream iss(pgn);
+    std::string token;
+    for (int i = 0; std::getline(iss, token, ' '); i++)
+    {
+        if (i % 3 == 0) // We don't need move number.
+            continue;
+        // trim string
+        token.erase(0, token.find_first_not_of(' '));
+        token.erase(token.find_last_not_of(' ') + 1);
+
+        Chessboard::Move tmp = Chessboard::moveFromSAN(token);
+        result.push_back(tmp);
+    }
+
+    return result;
 }
