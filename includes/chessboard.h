@@ -45,6 +45,7 @@ class Chessboard
 			this->pieceOnMove = pieceOnMove;
 			ambiguousX = false;
 			ambiguousY = false;
+			pieceType = EMPTY;
 		}
 
 		// If moveType is CASTLING
@@ -55,6 +56,7 @@ class Chessboard
 			this->kingSideCastle = kingSideCastle;
 			ambiguousX = false;
 			ambiguousY = false;
+			pieceType = EMPTY;
 		}
 
 		move_t(MoveType moveType, Position from, Position to, PieceType pieceOnMove)
@@ -65,6 +67,7 @@ class Chessboard
 			this->pieceOnMove = pieceOnMove;
 			ambiguousX = false;
 			ambiguousY = false;
+			pieceType = EMPTY;
 		}
 	} Move;
 

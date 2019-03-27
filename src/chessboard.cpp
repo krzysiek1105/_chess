@@ -425,7 +425,7 @@ bool Chessboard::makeMove(Move move)
 		if (move.moveType == NORMAL || move.moveType == EN_PASSANT || move.moveType == BEATING)
 			return makeMove(move.from, move.to);
 		else
-			return false;
+			return makeMove(move.pieceType, move.from, move.to);
 	}
 	else
 		return makeMove(move.side, move.kingSideCastle);
