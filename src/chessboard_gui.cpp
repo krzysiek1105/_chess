@@ -164,4 +164,5 @@ void ChessboardGUI::resetAll()
     updatePieces();
     resetHighlighting();
     sanMoves.clear();
+	movesPanel->removeAllItems();
 }

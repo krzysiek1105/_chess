@@ -9,33 +9,17 @@ int main()
 	Position from;
 	Position to;
 
-	sf::Font font;
-	if (!font.loadFromFile("arial.ttf"))
-		return 1;
-	int startHistory = 0;
-
+	std::vector<sf::String> san;
 	while (chessboardGUI.window->isOpen())
 	{
 		sf::Event event;
+		
 		while (chessboardGUI.window->pollEvent(event))
-		{
+		{	
 			chessboardGUI.gui.handleEvent(event);
 
 			if (event.type == sf::Event::Closed)
 				chessboardGUI.window->close();
-
-			if (event.type == sf::Event::MouseWheelScrolled)
-			{
-				if (chessboardGUI.sanMoves.size() >= MOVE_HISTORY_LINE_COUNT)
-				{
-					int delta = event.mouseWheelScroll.delta;
-					startHistory += event.mouseWheelScroll.delta;
-					if (startHistory < 0)
-						startHistory = 0;
-					if (startHistory > chessboardGUI.sanMoves.size() - 1)
-						startHistory = chessboardGUI.sanMoves.size() - 1;
-				}
-			}
 
 			if (event.type == sf::Event::MouseButtonPressed)
 			{
@@ -97,15 +81,16 @@ int main()
 
 				if (successfulMove)
 				{
-					if (chessboardGUI.logicBoard.moveHistory.size() % 2 != 0)
-					{
-						chessboardGUI.sanMoves.push_back(chessboardGUI.logicBoard.getSanString());
-						if (chessboardGUI.sanMoves.size() > MOVE_HISTORY_LINE_COUNT)
-							startHistory = chessboardGUI.sanMoves.size() - MOVE_HISTORY_LINE_COUNT;
-					}
+					
+					if (chessboardGUI.logicBoard.moveHistory.size() % 2 != 0) 
+						san.push_back(std::to_string(chessboardGUI.logicBoard.moveHistory.size() / 2 + 1) + ". ");
 					else
-						chessboardGUI.sanMoves[chessboardGUI.sanMoves.size() - 1] += chessboardGUI.logicBoard.getSanString();
-
+						chessboardGUI.movesPanel->removeItem(chessboardGUI.movesPanel->getItemCount() - 1);
+				
+					san.push_back(chessboardGUI.logicBoard.getSanString());
+					chessboardGUI.movesPanel->addItem(san);
+					if (chessboardGUI.logicBoard.moveHistory.size() % 2 == 0)
+						san.clear();
 					std::cout << fromString << " " << toString << std::endl;
 					std::cout << chessboardGUI.logicBoard;
 					chessboardGUI.updatePieces();
@@ -117,9 +102,11 @@ int main()
 						windowTitle.append("(CHECK)");
 						break;
 					case Chessboard::MATE:
+						san.clear();
 						windowTitle.append("(MATE)");
 						break;
 					case Chessboard::STALEMATE:
+						san.clear();
 						windowTitle.append("(STALEMATE)");
 						break;
 					}
@@ -134,23 +121,6 @@ int main()
 			chessboardGUI.window->draw(chessboardGUI.squares[i]);
 		for (int i = 0; i < chessboardGUI.piecesOnBoard; i++)
 			chessboardGUI.window->draw(chessboardGUI.pieces[i]);
-
-		std::vector<sf::Text> sanMovesText;
-		for (int i = 0; i < MOVE_HISTORY_LINE_COUNT; i++)
-		{
-			int j = i + startHistory;
-			if (j >= chessboardGUI.sanMoves.size())
-				break;
-			sf::Text tmp;
-			tmp.setFont(font);
-			tmp.setFillColor(sf::Color(118, 77, 46, 255));
-			tmp.setPosition(CHESSBOARD_SIZE + SIDE_PANEL_PADDING, SIDE_PANEL_PADDING * (i + 1));
-			tmp.setString(chessboardGUI.sanMoves[j]);
-
-			sanMovesText.push_back(tmp);
-		}
-		for (sf::Text &text : sanMovesText)
-			chessboardGUI.window->draw(text);
 
 		chessboardGUI.gui.draw();
 		chessboardGUI.window->display();

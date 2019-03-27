@@ -2,11 +2,8 @@
 
 void Chessboard::setSanString(PieceType promotion)
 {
-    int moveNumber = moveHistory.size();
-    Chessboard::Move lastMove = moveHistory[moveNumber - 1];
+    Chessboard::Move lastMove = moveHistory[moveHistory.size() - 1];
     sanString = "";
-    if (moveNumber % 2 != 0)
-        sanString += std::to_string(moveNumber / 2 + 1) + ". ";
 
     if (lastMove.moveType != Chessboard::CASTLING)
     {
@@ -44,7 +41,7 @@ void Chessboard::setSanString(PieceType promotion)
         sanString += '+';
     if (getGameState() == Chessboard::MATE)
         sanString += '#';
-    sanString += moveNumber % 2 != 0 ? "  " : "\n";
+	sanString += " ";
 }
 
 std::string Chessboard::getSanString()
