@@ -10,7 +10,7 @@ int main()
 	// game.append("20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6 23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 ");
 	// game.append("28. Qxg5 hxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5 35. Ra7 g6 36. Ra6+ Kc5 ");
 	// game.append("37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6 Nf2 42. g4 Bd3 43. Re6 1/2-1/2");
-	std::string game("1. e4 f5 2. exf5 g6 3. fxg6 Nf6 4. g7 Nd5 5. g8=Q");
+	std::string game("1. e4 f5 2. exf5 g6 3. fxg6 Nf6 4. g7 Ne4 5. gxh8=Q e6 6. Qf3 Nc5 7. h4 Qe7 8. h5 Qd8 9. h6 Qe7 10. Qxh7 Qd6 11. Qhe4 Nb3 12. h7 Qe7 13. h8=Q d5 14. Qeh7 Nd7 15. Qg3 Ndc5 16. Qgg8 Nd7 17. Qh8g7");
 
 	std::vector<Chessboard::Move>
 		moves = chessboardGUI.logicBoard.movesFromPGN(game);

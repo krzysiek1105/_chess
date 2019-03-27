@@ -71,7 +71,9 @@ Chessboard::Move Chessboard::moveFromSAN(std::string san)
     {
         int isBeating = !!(san.find("x") != std::string::npos);
         int isCheckOrMateMove = !!(san.find_first_of("+#") != std::string::npos);
-        if (san.find_first_of("BNRQK") != std::string::npos)
+        bool isPromoted = !!(san.find("=") != std::string::npos);
+
+        if (san.find_first_of("BNRQK") != std::string::npos && !isPromoted)
         {
             int column = -1;
             int row = -1;
@@ -125,7 +127,6 @@ Chessboard::Move Chessboard::moveFromSAN(std::string san)
         }
         else // It's a pawn move.
         {
-            bool isPromoted = !!(san.find("=") != std::string::npos);
             PieceType promoted = EMPTY;
             Position to(san[0 + isBeating * 2] - 'a', san[1 + isBeating * 2] - '1');
             int column;
@@ -145,7 +146,7 @@ Chessboard::Move Chessboard::moveFromSAN(std::string san)
 
             if (isPromoted)
             {
-                switch (san[4 + isBeating])
+                switch (san[3 + isBeating * 2])
                 {
                 case 'B':
                     promoted = BISHOP;
