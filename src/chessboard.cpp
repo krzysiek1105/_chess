@@ -61,7 +61,7 @@ void Chessboard::reset()
 std::vector<Chessboard::Move> Chessboard::getLegalMovesAt(Position position)
 {
 	std::vector<Chessboard::Move> result;
-	Piece& current = pieces[position.x][position.y];
+	Piece &current = pieces[position.x][position.y];
 	Position axis = isGuardian(position);
 
 	switch (current.pieceType)
@@ -172,7 +172,7 @@ void Chessboard::getLegalMoves()
 	{
 		gameState = CHECK;
 		// Check if the king can escape or beat attacking piece
-		for (Move& m : kingLegalMoves)
+		for (Move &m : kingLegalMoves)
 		{
 			if (isSquareSafe(m.to, side))
 			{
@@ -199,7 +199,7 @@ void Chessboard::getLegalMoves()
 
 		if (checks.size() == 1)
 		{
-			for (Move& move : piecesLegalMoves)
+			for (Move &move : piecesLegalMoves)
 			{
 				// Piece can beat opponent's piece
 				if (move.to == checks[0])
@@ -219,7 +219,7 @@ void Chessboard::getLegalMoves()
 		std::vector<Move> castling = getCastling();
 		result.insert(result.end(), castling.begin(), castling.end());
 
-		for (Move& m : kingLegalMoves)
+		for (Move &m : kingLegalMoves)
 			if (isSquareSafe(m.to, side))
 				result.push_back(m);
 
@@ -248,7 +248,8 @@ void Chessboard::getLegalMoves()
 					{
 						if (piece == KNIGHT)
 						{
-							if (bishopSquareColor) {
+							if (bishopSquareColor)
+							{
 								stalemate = false;
 								break;
 							}
@@ -264,7 +265,8 @@ void Chessboard::getLegalMoves()
 							}
 							bishopSquareColor = curColor;
 						}
-						else {
+						else
+						{
 							stalemate = false;
 							break;
 						}
@@ -281,7 +283,7 @@ void Chessboard::getLegalMoves()
 		{
 			if (!(m1.from == m2.from) && m1.pieceOnMove == m2.pieceOnMove && m1.to == m2.to)
 			{
-				if(m1.from.x == m2.from.x)
+				if (m1.from.x == m2.from.x)
 				{
 					m1.ambiguousY = true;
 					m2.ambiguousY = true;
@@ -291,7 +293,6 @@ void Chessboard::getLegalMoves()
 					m1.ambiguousX = true;
 					m2.ambiguousX = true;
 				}
-				
 			}
 		}
 
@@ -417,7 +418,25 @@ bool Chessboard::makeMove(PieceType promoted, Position from, Position to)
 	return true;
 }
 
-std::ostream& operator<<(std::ostream & s, const Chessboard & c)
+bool Chessboard::makeMove(Move move)
+{
+	if (move.moveType != Chessboard::CASTLING)
+	{
+		if (move.moveType == NORMAL || move.moveType == EN_PASSANT || move.moveType == BEATING)
+			return makeMove(move.from, move.to);
+		else if(move.moveType == PAWN_PROMOTION || move.moveType == PAWN_PROMOTION_WITH_BEATING)
+			return makeMove(move.pieceType, move.from, move.to);
+	}
+	else
+		return makeMove(move.side, move.kingSideCastle);
+}
+
+bool Chessboard::makeMove(std::string pgn)
+{
+	return makeMove(Chessboard::moveFromSAN(pgn));
+}
+
+std::ostream &operator<<(std::ostream &s, const Chessboard &c)
 {
 	for (int y = 7; y >= 0; y--)
 	{
@@ -435,7 +454,7 @@ std::ostream& operator<<(std::ostream & s, const Chessboard & c)
 	for (int i = 0; i < 8; i++)
 		s << (char)('a' + i) << " ";
 	s << std::endl
-		<< std::endl;
+	  << std::endl;
 	return s;
 }
 
