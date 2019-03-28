@@ -24,7 +24,6 @@ class ChessboardGUI
     Chessboard logicBoard;
     std::vector<sf::Texture> piecesTextures;
     std::vector<sf::Texture> boardTextures;
-    std::vector<std::string> sanMoves;
     std::vector<sf::String> san;
 
     std::vector<sf::Sprite> squares;

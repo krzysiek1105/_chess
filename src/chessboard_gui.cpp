@@ -139,8 +139,8 @@ PieceType ChessboardGUI::showPromotion()
         {
             int fieldX = (event.mouseButton.x / (float)CHESSBOARD_SIZE) * 8;
             int fieldY = 8 - (event.mouseButton.y / (float)CHESSBOARD_SIZE) * 8;
-			if (fieldY != 4)
-				return EMPTY;
+            if (fieldY != 4)
+                return EMPTY;
             switch (fieldX)
             {
             case 2:
@@ -151,8 +151,8 @@ PieceType ChessboardGUI::showPromotion()
                 return ROOK;
             case 5:
                 return QUEEN;
-			default:
-				return EMPTY;
+            default:
+                return EMPTY;
             }
         }
     }
@@ -163,16 +163,31 @@ void ChessboardGUI::resetAll()
     logicBoard.reset();
     updatePieces();
     resetHighlighting();
-    sanMoves.clear();
-	movesPanel->removeAllItems();
+    san.clear();
+    movesPanel->removeAllItems();
 }
 
 void ChessboardGUI::loadFromPGNTextBox()
 {
     resetAll();
     std::string data = PGNTextBox->getText();
-    printf("%d\n", logicBoard.movesFromPGN(data).size());
-    std::cout << logicBoard.getSanString() << std::endl;
+    logicBoard.movesFromPGN(data);
+
+    std::istringstream iss(logicBoard.getSanString().append(" "));
+    std::string token;
+    for (int i = 1; std::getline(iss, token, ' '); i++)
+    {
+        if (i % 2 != 0)
+            san.push_back(std::to_string(i / 2 + 1) + ". ");
+        else
+            movesPanel->removeItem(movesPanel->getItemCount() - 1);
+
+        san.push_back(token);
+        movesPanel->addItem(san);
+        if (i % 2 == 0)
+            san.clear();
+    }
+
     updatePieces();
 }
 
@@ -183,7 +198,9 @@ void ChessboardGUI::updateAfterMove()
     else
         movesPanel->removeItem(movesPanel->getItemCount() - 1);
 
-    san.push_back(logicBoard.getSanString());
+    std::string sanString = logicBoard.getSanString();
+    std::string lastMoveFromSAN = sanString.erase(0, sanString.find_last_of(' '));
+    san.push_back(lastMoveFromSAN);
     movesPanel->addItem(san);
     if (logicBoard.moveHistory.size() % 2 == 0)
         san.clear();
