@@ -166,3 +166,99 @@ void ChessboardGUI::resetAll()
     sanMoves.clear();
 	movesPanel->removeAllItems();
 }
+
+void ChessboardGUI::loadFromPGNTextBox()
+{
+    resetAll();
+    std::string data = PGNTextBox->getText();
+    printf("%d\n", logicBoard.movesFromPGN(data).size());
+    std::cout << logicBoard.getSanString() << std::endl;
+    updatePieces();
+}
+
+void ChessboardGUI::updateAfterMove()
+{
+    if (logicBoard.moveHistory.size() % 2 != 0)
+        san.push_back(std::to_string(logicBoard.moveHistory.size() / 2 + 1) + ". ");
+    else
+        movesPanel->removeItem(movesPanel->getItemCount() - 1);
+
+    san.push_back(logicBoard.getSanString());
+    movesPanel->addItem(san);
+    if (logicBoard.moveHistory.size() % 2 == 0)
+        san.clear();
+    updatePieces();
+
+    std::string windowTitle = logicBoard.getCurrentSide() == WHITE ? "White move " : "Black move ";
+    switch (logicBoard.getGameState())
+    {
+    case Chessboard::CHECK:
+        windowTitle.append("(CHECK)");
+        break;
+    case Chessboard::MATE:
+        san.clear();
+        windowTitle.append("(MATE)");
+        break;
+    case Chessboard::STALEMATE:
+        san.clear();
+        windowTitle.append("(STALEMATE)");
+        break;
+    }
+    window->setTitle(windowTitle);
+}
+
+bool ChessboardGUI::tryMove(Position from, Position to)
+{
+    std::string fromString;
+    fromString += "abcdefgh"[from.x];
+    fromString += "12345678"[from.y];
+
+    std::string toString;
+    toString += "abcdefgh"[to.x];
+    toString += "12345678"[to.y];
+
+    bool successfulMove = false;
+    if (fromString == "e1" && (toString == "h1" || toString == "g1"))
+        successfulMove = logicBoard.makeMove(WHITE, true);
+    else if (fromString == "e1" && (toString == "a1" || toString == "c1"))
+        successfulMove = logicBoard.makeMove(WHITE, false);
+    else if (fromString == "e8" && (toString == "h8" || toString == "g8"))
+        successfulMove = logicBoard.makeMove(BLACK, true);
+    else if (fromString == "e8" && (toString == "a8" || toString == "c8"))
+        successfulMove = logicBoard.makeMove(BLACK, false);
+    else
+    {
+        Piece currentPiece = logicBoard.getPieceAt(from);
+        if (logicBoard.getGameState() == Chessboard::IN_GAME && currentPiece.pieceType == PAWN && currentPiece.side == logicBoard.getCurrentSide() && (to.y == 0 || to.y == 7))
+        {
+            bool canBePromoted = false;
+            std::vector<Chessboard::Move> moves = logicBoard.getLegalMovesAt(from);
+            for (Chessboard::Move move : moves)
+                if ((move.moveType == Chessboard::PAWN_PROMOTION || move.moveType == Chessboard::PAWN_PROMOTION_WITH_BEATING) && move.from == from && move.to == to)
+                {
+                    canBePromoted = true;
+                    break;
+                }
+
+            if (canBePromoted)
+            {
+                PieceType pieceType = showPromotion();
+                successfulMove = logicBoard.makeMove(pieceType, from, to);
+            }
+        }
+        else
+            successfulMove = logicBoard.makeMove(from, to);
+    }
+
+    return successfulMove;
+}
+
+void ChessboardGUI::draw()
+{
+    window->clear(sf::Color(206, 186, 140, 255));
+    for (int i = 0; i < 64; i++)
+        window->draw(squares[i]);
+    for (int i = 0; i < piecesOnBoard; i++)
+        window->draw(pieces[i]);
+    gui.draw();
+}

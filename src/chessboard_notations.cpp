@@ -179,6 +179,7 @@ Chessboard::Move Chessboard::moveFromSAN(std::string san)
 
 std::vector<Chessboard::Move> Chessboard::movesFromPGN(std::string pgn)
 {
+    reset();
     std::vector<Chessboard::Move> result;
     std::istringstream iss(pgn);
     std::string token;
@@ -191,10 +192,11 @@ std::vector<Chessboard::Move> Chessboard::movesFromPGN(std::string pgn)
         token.erase(token.find_last_not_of(' ') + 1);
 
         Chessboard::Move tmp = Chessboard::moveFromSAN(token);
+        // makeMove(tmp);
         makeMove(tmp);
         result.push_back(tmp);
     }
 
-    reset();
+    // reset();
     return result;
 }

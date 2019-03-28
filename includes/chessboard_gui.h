@@ -17,12 +17,15 @@ class ChessboardGUI
 	sf::Font font;
     tgui::Gui gui;
     tgui::Theme theme;
-    tgui::Button::Ptr button;
+    tgui::Button::Ptr resetButton;
 	tgui::ListView::Ptr movesPanel;
+    tgui::TextBox::Ptr PGNTextBox;
+    tgui::Button::Ptr PGNButton;
     Chessboard logicBoard;
     std::vector<sf::Texture> piecesTextures;
     std::vector<sf::Texture> boardTextures;
     std::vector<std::string> sanMoves;
+    std::vector<sf::String> san;
 
     std::vector<sf::Sprite> squares;
     std::vector<sf::Sprite> pieces;
@@ -37,7 +40,12 @@ class ChessboardGUI
     void highlight(Position from);
     void resetHighlighting();
     void resetAll();
+    void loadFromPGNTextBox();
+    bool tryMove(Position from, Position to);
+    void updateAfterMove();
+    void draw();
 	PieceType showPromotion();
+
     ChessboardGUI()
     {
         window = new sf::RenderWindow(sf::VideoMode(CHESSBOARD_SIZE + SIDE_PANEL_WIDTH, CHESSBOARD_SIZE), "Chess", sf::Style::Titlebar | sf::Style::Close);
@@ -48,12 +56,12 @@ class ChessboardGUI
 		font.loadFromFile("arial.ttf");
 		tgui::setGlobalFont(font);
 
-        button = tgui::Button::create("Reset");
-        button->setRenderer(theme.getRenderer("Button"));
-        button->setSize(100, 30);
-        button->setPosition(CHESSBOARD_SIZE + SIDE_PANEL_PADDING, 0);
-        button->connect("pressed", &ChessboardGUI::resetAll, this);
-        gui.add(button);
+        resetButton = tgui::Button::create("Reset");
+        resetButton->setRenderer(theme.getRenderer("Button"));
+        resetButton->setSize(100, 30);
+        resetButton->setPosition(CHESSBOARD_SIZE + SIDE_PANEL_PADDING, 0);
+        resetButton->connect("pressed", &ChessboardGUI::resetAll, this);
+        gui.add(resetButton);
 
 		movesPanel = tgui::ListView::create();
 		movesPanel->setRenderer(theme.getRenderer("ListView"));
@@ -66,6 +74,18 @@ class ChessboardGUI
 		movesPanel->addColumn("black", 92);
 		movesPanel->setGridLinesWidth(0);
 		gui.add(movesPanel);
+
+        PGNTextBox = tgui::TextBox::create();
+        PGNTextBox->setRenderer(theme.getRenderer("TextBox"));
+        PGNTextBox->setPosition(CHESSBOARD_SIZE + SIDE_PANEL_PADDING, 385);
+        gui.add(PGNTextBox);
+
+        PGNButton = tgui::Button::create("Load PGN");
+        PGNButton->setRenderer(theme.getRenderer("Button"));
+        PGNButton->setSize(100, 30);
+        PGNButton->setPosition(CHESSBOARD_SIZE + SIDE_PANEL_PADDING, 550);
+        PGNButton->connect("pressed", &ChessboardGUI::loadFromPGNTextBox, this);
+        gui.add(PGNButton);
 
         loadPiecesTextures();
         loadBoardTextures();
