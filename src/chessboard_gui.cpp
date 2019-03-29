@@ -173,7 +173,7 @@ void ChessboardGUI::loadFromPGNTextBox()
     std::string data = PGNTextBox->getText();
     logicBoard.movesFromPGN(data);
 
-    std::istringstream iss(logicBoard.getSanString().append(" "));
+    std::istringstream iss(logicBoard.getSanString().erase(0, 1).append(" "));
     std::string token;
     for (int i = 1; std::getline(iss, token, ' '); i++)
     {
